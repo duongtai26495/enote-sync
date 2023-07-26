@@ -1,5 +1,6 @@
 package com.kai.enote.controllers;
 
+import com.kai.enote.models.LoginResponseDTO;
 import com.kai.enote.models.User;
 import com.kai.enote.models.UserDTO;
 import com.kai.enote.service.UserServiceImpl;
@@ -14,6 +15,7 @@ public class PublicController {
     @Autowired
     private UserServiceImpl userService;
 
+
     @PostMapping("register")
     public UserDTO register(@RequestBody User user){
         UserDTO userDTO = new UserDTO();
@@ -23,4 +25,8 @@ public class PublicController {
         return userDTO;
     }
 
+    @PostMapping("login")
+    public LoginResponseDTO login(@RequestBody User user){
+        return userService.loginUser(user.getUsername(), user.getPassword());
+    }
 }

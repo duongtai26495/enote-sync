@@ -1,11 +1,17 @@
 package com.kai.enote.service;
 
+import com.kai.enote.models.LoginResponseDTO;
 import com.kai.enote.models.Role;
 import com.kai.enote.models.User;
 import com.kai.enote.repository.RoleRepository;
 import com.kai.enote.repository.UserRepository;
+import com.kai.enote.utils.TokenService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,8 +23,7 @@ import java.util.Set;
 
 
 @Service
-@Transactional
-public class UserServiceImpl implements UserDetailsService, UserService {
+public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -29,12 +34,12 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Autowired
     private RoleRepository roleRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println("User details service");
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User "+username+" is not found"));
-    }
+    @Autowired
+    private TokenService tokenService;
+
 
     @Override
     public User saveNewUser(User user) {
@@ -44,5 +49,21 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         user.setAuthorities(roles);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    public LoginResponseDTO loginUser(String username, String password){
+
+        try {
+
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+
+            String token = tokenService.generateJwt(auth);
+
+            return new LoginResponseDTO(userRepository.findByUsername(username).get(), token);
+        }catch (AuthenticationException e){
+            return new LoginResponseDTO(null,"");
+        }
     }
 }

@@ -30,7 +30,7 @@ public class EnoteSyncApplication {
 			roles.add(adminRole);
 
 			User admin = new User();
-			admin.setUsername("Admin");
+			admin.setUsername("admin");
 			admin.setPassword(passwordEncoder.encode("Blackhat1"));
 			admin.setAuthorities(roles);
 			admin.setFullname("Kai Admin");
