@@ -3,16 +3,13 @@ package com.kai.mynote.service.Impl;
 import com.kai.mynote.config.MyUserDetails;
 import com.kai.mynote.dto.UserDTO;
 import com.kai.mynote.dto.UserRegisterDTO;
+import com.kai.mynote.dto.UserUpdateDTO;
 import com.kai.mynote.entities.Role;
 import com.kai.mynote.entities.User;
 import com.kai.mynote.repository.RoleRepository;
 import com.kai.mynote.repository.UserRepository;
 import com.kai.mynote.service.UserService;
-import com.sun.tools.jconsole.JConsoleContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -50,8 +47,27 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserDTO updateUser(User user) {
-        return null;
+    public User updateUser(UserUpdateDTO updateDTO) {
+        User existingUser = userRepository.findFirstByUsername(updateDTO.getUsername());
+        if (existingUser == null) {
+            return null;
+        }
+
+        String firstName = updateDTO.getF_name();
+        String lastName = updateDTO.getL_name();
+        String password = updateDTO.getPassword();
+
+        if (firstName != null) {
+            existingUser.setF_name(firstName);
+        }
+        if (lastName != null) {
+            existingUser.setL_name(lastName);
+        }
+        if (password != null) {
+            existingUser.setPassword(password);
+        }
+
+        return userRepository.save(existingUser);
     }
 
     @Override

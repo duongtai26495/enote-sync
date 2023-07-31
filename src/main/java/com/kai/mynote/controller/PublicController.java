@@ -3,6 +3,7 @@ package com.kai.mynote.controller;
 import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.dto.UserDTO;
 import com.kai.mynote.dto.UserRegisterDTO;
+import com.kai.mynote.dto.UserUpdateDTO;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -30,6 +29,12 @@ public class PublicController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @GetMapping("hello")
+    public String hello(){
+        return "Hello";
+    }
+
     @PostMapping("sign-up")
     public ResponseEntity<ResponseObject> signUp(@RequestBody UserRegisterDTO userRegisterDTO) {
         if (userService.isExistByEmail(userRegisterDTO.getEmail())) {

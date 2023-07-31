@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -27,6 +28,12 @@ public class User {
     private String username;
 
     private String password;
+
+    @OneToMany(mappedBy = "author")
+    private List<WorkSpace> workspaces;
+
+    @OneToMany(mappedBy = "author")
+    private List<Note> notes;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
