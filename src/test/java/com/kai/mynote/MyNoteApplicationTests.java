@@ -1,10 +1,10 @@
-package com.kai.enote;
+package com.kai.mynote;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EnoteSyncApplicationTests {
+class MyNoteApplicationTests {
 
 	@Test
 	void contextLoads() {
