@@ -1,6 +1,7 @@
 package com.kai.mynote.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.kai.mynote.dto.UserDTO;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -30,6 +31,7 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "author")
+    @JsonManagedReference
     private List<WorkSpace> workspaces;
 
     @OneToMany(mappedBy = "author")

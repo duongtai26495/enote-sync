@@ -26,13 +26,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .addFilterBefore(requestFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->{
                     auth.requestMatchers("/public/**").permitAll();
-                    auth.requestMatchers("/user/**", "/note/**").hasRole("USER");
+                    auth.requestMatchers("/user/**", "/note/**", "/workspace/**").hasRole("USER");
+                    auth.anyRequest().authenticated();
                 })
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(requestFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
