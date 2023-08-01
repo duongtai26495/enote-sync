@@ -22,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -61,7 +62,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateUser(UserUpdateDTO updateDTO) {
+    public UserDTO updateUser(UserUpdateDTO updateDTO) {
         User existingUser = userRepository.findFirstByUsername(updateDTO.getUsername());
         if (existingUser == null) {
             return null;
@@ -78,10 +79,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             existingUser.setL_name(lastName);
         }
         if (password != null) {
-            existingUser.setPassword(password);
+            existingUser.setPassword(new BCryptPasswordEncoder().encode(password));
         }
+        userRepository.save(existingUser);
 
-        return userRepository.save(existingUser);
+        return existingUser.convertDTO(existingUser);
     }
 
     @Override

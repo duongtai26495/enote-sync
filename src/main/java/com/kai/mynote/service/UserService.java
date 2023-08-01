@@ -14,7 +14,7 @@ import java.util.List;
 public interface UserService {
     UserDTO createUser(UserRegisterDTO userRegisterDTO);
 
-    User updateUser(UserUpdateDTO updateDTO);
+    UserDTO updateUser(UserUpdateDTO updateDTO);
 
     UserDTO getUserByUsername(String username);
 

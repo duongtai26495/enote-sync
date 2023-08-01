@@ -15,13 +15,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user/")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
     private UserServiceImpl userService;
 
-    @GetMapping("{username}")
+    @GetMapping("/{username}")
     public ResponseEntity<ResponseObject> getInfoUser(@PathVariable String username, Authentication authentication){
         if ( authentication.getName().equalsIgnoreCase(username)){
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS","User information", userService.getUserByUsername(username)));
@@ -31,12 +31,10 @@ public class UserController {
         }
     }
 
-    @PutMapping("update")
+    @PutMapping("/update")
     public ResponseEntity<ResponseObject> updateUser(@RequestBody UserUpdateDTO updateDTO, Authentication authentication){
-        if ( authentication.getName().equalsIgnoreCase(updateDTO.getUsername())){
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS","User updated", userService.updateUser(updateDTO)));
-        };
-        return createErrorResponse("Not permission");
+        updateDTO.setUsername(authentication.getName());
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS","User updated", userService.updateUser(updateDTO)));
     }
 
 
@@ -47,4 +45,5 @@ public class UserController {
     private ResponseEntity<ResponseObject> createSuccessResponse(UserDTO userDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS", "User Registered Successfully", userDTO));
     }
+
 }

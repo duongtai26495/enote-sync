@@ -30,7 +30,7 @@ public class WorkSpace {
 
     @ManyToOne
     @JoinColumn(name = "author_id")
-    @JsonBackReference
+    @JsonIgnore
     private User author;
 
 }

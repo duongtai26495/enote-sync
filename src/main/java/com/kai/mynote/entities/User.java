@@ -1,6 +1,7 @@
 package com.kai.mynote.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.kai.mynote.dto.UserDTO;
 import jakarta.persistence.*;
@@ -31,10 +32,10 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "author")
-    @JsonManagedReference
     private List<WorkSpace> workspaces;
 
     @OneToMany(mappedBy = "author")
+    @JsonIgnore
     private List<Note> notes;
 
     @ManyToMany(fetch = FetchType.EAGER)

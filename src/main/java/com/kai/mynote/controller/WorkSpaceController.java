@@ -15,7 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/workspace/")
+@RequestMapping("/workspace")
 public class WorkSpaceController {
 
     @Autowired
@@ -32,10 +32,10 @@ public class WorkSpaceController {
             return userService.getAllWorkspace(authentication.getName(), page, size);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public Page<Note> getNotesByWorkspaceId(@PathVariable Long id, Authentication authentication,
                                             @RequestParam(defaultValue = "0") int page,
-                                            @RequestParam(defaultValue = "12") int size){
+                                            @RequestParam(defaultValue = "30") int size){
         WorkSpace workSpace = workspaceService.getWorkspaceById(id);
         if (authentication.getName().equalsIgnoreCase(workSpace.getAuthor().getUsername())){
             return workspaceService.getAllNoteByWorkspaceId(id, page, size);
@@ -43,7 +43,7 @@ public class WorkSpaceController {
         return null;
     }
 
-    @PostMapping("add")
+    @PostMapping("/add")
     public ResponseEntity<ResponseObject> addWs(@RequestBody(required = false) WorkSpace workSpace, Authentication authentication){
             if (workSpace == null){
                 workSpace = new WorkSpace();
@@ -56,7 +56,7 @@ public class WorkSpaceController {
     }
 
 
-    @PutMapping("update")
+    @PutMapping("/update")
     public ResponseEntity<ResponseObject> updateWs(@RequestBody WorkSpace workSpace, Authentication authentication){
         WorkSpace ws = workspaceService.getWorkspaceById(workSpace.getId());
         if (ws != null && ws.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
@@ -70,7 +70,7 @@ public class WorkSpaceController {
     }
 
 
-    @DeleteMapping("remove/{id}")
+    @DeleteMapping("/remove/{id}")
     public ResponseEntity<ResponseObject> deleteWs(@PathVariable Long id, Authentication authentication){
         WorkSpace ws = workspaceService.getWorkspaceById(id);
         if (ws != null && ws.getNotes().size() == 0){

@@ -1,6 +1,7 @@
 package com.kai.mynote.service.Impl;
 
 import com.kai.mynote.entities.Note;
+import com.kai.mynote.entities.NoteType;
 import com.kai.mynote.repository.NoteRepository;
 import com.kai.mynote.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ public class NoteServiceImpl implements NoteService {
     public Note create(Note note) {
         if (note.getContent() == null){
             note.setContent("");
+        }
+        if (note.getType() == null){
+            note.setType(NoteType.NOTE);
         }
         return noteRepository.save(note);
     }
@@ -34,10 +38,13 @@ public class NoteServiceImpl implements NoteService {
             if (note.getWorkspace() !=null && !currentNote.getWorkspace().equals(note.getWorkspace()))
             {currentNote.setWorkspace(note.getWorkspace());}
 
+            if (note.getType() != null && !currentNote.getType().equals(note.getType()))
+            {currentNote.setType(note.getType());}
+
             currentNote.setEnabled(note.isEnabled());
             currentNote.setDone(note.isDone());
 
-            noteRepository.save(currentNote);
+            return noteRepository.save(currentNote);
         }
         return null;
     }

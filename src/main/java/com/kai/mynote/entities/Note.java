@@ -19,6 +19,8 @@ public class Note {
     @Column(length = 5000)
     private String content;
 
+    private NoteType type = NoteType.NOTE;
+
     private boolean isDone = false;
 
     private boolean enabled = true;
