@@ -92,5 +92,4 @@ public class NoteController {
                 new ResponseObject("FAIL","Bad request",null)
         );
     }
-
 }
