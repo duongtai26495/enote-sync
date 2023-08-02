@@ -83,7 +83,7 @@ public class NoteController {
     public ResponseEntity<ResponseObject> deleteNote(@PathVariable Long id, Authentication authentication){
         Note currentNote = noteService.getNoteById(id);
 
-            if (currentNote.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
+            if (currentNote != null && currentNote.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
                 noteService.removeById(id);
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.NOTE +" "+AppConstants.REMOVED, null)

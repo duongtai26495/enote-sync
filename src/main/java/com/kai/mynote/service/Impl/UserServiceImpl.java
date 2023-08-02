@@ -1,5 +1,6 @@
 package com.kai.mynote.service.Impl;
 
+import com.kai.mynote.assets.AppConstants;
 import com.kai.mynote.config.MyUserDetails;
 import com.kai.mynote.dto.UserDTO;
 import com.kai.mynote.dto.UserRegisterDTO;
@@ -54,9 +55,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDTO createUser(UserRegisterDTO userRegisterDTO) {
         User user = new User();
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findRoleByName("ROLE_USER"));
-        user.setRoles(roles);
+        List<Role> roles = roleRepository.findAll();
+        user.setRoles(roles.stream().filter(role -> role.getRole_name().equals(AppConstants.ROLE_PREFIX+AppConstants.ROLE_USER_NAME)).toList());
         user.setF_name(userRegisterDTO.getF_name());
         user.setL_name(userRegisterDTO.getL_name());
         user.setUsername(userRegisterDTO.getUsername());
