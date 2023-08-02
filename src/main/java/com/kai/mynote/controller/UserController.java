@@ -52,30 +52,36 @@ public class UserController {
 
     @GetMapping("refresh")
     public ResponseEntity<ResponseObject> refreshToken(Authentication authentication, HttpServletRequest request){
-        getAndAddTokenToBlackList(authentication, request);
-        return ResponseEntity.ok(new ResponseObject("SUCCESS", "User Login Successfully", jwtUtil.generateToken(authentication.getName())));
+        if (getAndAddTokenToBlackList(authentication, request)) {
+            return ResponseEntity.ok(new ResponseObject("SUCCESS", "Refresh token Successfully", jwtUtil.generateToken(authentication.getName())));
+        }
+        return createErrorResponse();
     }
 
     @PutMapping("update-password")
     public ResponseEntity<ResponseObject> updatePassword(@RequestBody UserUpdateDTO updateDTO, Authentication authentication, HttpServletRequest request){
 
         if ( authentication.getName().equalsIgnoreCase(updateDTO.getUsername())){
-            getAndAddTokenToBlackList(authentication, request);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS","Password updated", userService.updatePassword(updateDTO)));
-
+            if (getAndAddTokenToBlackList(authentication, request)) {
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS", "Password updated", userService.updatePassword(updateDTO)));
+            }
         };
 
         return createErrorResponse();
     }
 
-    private void getAndAddTokenToBlackList (Authentication authentication, HttpServletRequest request){
+    private boolean getAndAddTokenToBlackList (Authentication authentication, HttpServletRequest request){
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String username = authentication.getName();
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            userService.addTokenToBlacklist(username, token);
+            if (jwtUtil.validateToken(token, userService.loadUserByUsername(username))){
+                userService.addTokenToBlacklist(username, token);
+                return true;
+            }
         }
+        return false;
     }
 }
