@@ -1,5 +1,6 @@
 package com.kai.mynote.filter;
 
+import com.kai.mynote.assets.AppConstants;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.util.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -29,11 +30,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
 
-            String authHeader = request.getHeader("Authorization");
+            String authHeader = request.getHeader(AppConstants.AUTH_HEADER);
             String token = null;
             String username = null;
 
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            if (authHeader != null && authHeader.startsWith(AppConstants.BEARER_TOKEN_PREFIX)) {
                 token = authHeader.substring(7);
                 username = jwtUtil.extractUsername(token);
             }
