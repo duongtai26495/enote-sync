@@ -4,29 +4,29 @@ import com.kai.mynote.config.MyUserDetails;
 import com.kai.mynote.dto.UserDTO;
 import com.kai.mynote.dto.UserRegisterDTO;
 import com.kai.mynote.dto.UserUpdateDTO;
-import com.kai.mynote.entities.Note;
-import com.kai.mynote.entities.Role;
-import com.kai.mynote.entities.User;
-import com.kai.mynote.entities.WorkSpace;
-import com.kai.mynote.repository.NoteRepository;
-import com.kai.mynote.repository.RoleRepository;
-import com.kai.mynote.repository.UserRepository;
-import com.kai.mynote.repository.WorkspaceRepository;
+import com.kai.mynote.entities.*;
+import com.kai.mynote.repository.*;
 import com.kai.mynote.service.UserService;
+import com.kai.mynote.util.JwtUtil;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 @Service
@@ -43,6 +43,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Autowired
     private WorkspaceRepository workspaceRepository;
+
+    @Autowired
+    private BlacklistRepository blacklistRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Override
     public UserDTO createUser(UserRegisterDTO userRegisterDTO) {
@@ -109,6 +115,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User getUserForAuthor(String username) {
         return userRepository.findFirstByUsername(username);
+    }
+
+    @Override
+    public void addTokenToBlacklist(String username, String token) {
+        Blacklist blacklist = new Blacklist();
+        blacklist.setToken(token);
+        blacklist.setUser(userRepository.findFirstByUsername(username));
+        blacklistRepository.save(blacklist);
+        System.out.println("Token added");
+    }
+
+    @Override
+    public Blacklist checkTokenInBlacklist(String username, String token) {
+        return blacklistRepository.isExistInBlacklist(username, token);
     }
 
     @Override

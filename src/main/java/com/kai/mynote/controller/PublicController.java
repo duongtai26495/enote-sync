@@ -71,9 +71,9 @@ public class PublicController {
 
         final UserDetails userDetails = userService.loadUserByUsername(userRegisterDTO.getUsername());
 
-        final String jwt = jwtUtil.generateToken(userDetails.getUsername());
+//        final String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
-        return ResponseEntity.ok(new ResponseObject("SUCCESS", "User Login Successfully", jwt));
+        return ResponseEntity.ok(new ResponseObject("SUCCESS", "User Login Successfully", jwtUtil.generateToken(userDetails.getUsername())));
     }
 
     private void authenticateUser(String username, String password) throws AuthenticationException {

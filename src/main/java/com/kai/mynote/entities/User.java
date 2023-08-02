@@ -1,6 +1,7 @@
 package com.kai.mynote.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.kai.mynote.dto.UserDTO;
 import jakarta.persistence.*;
@@ -29,6 +30,10 @@ public class User {
     private String username;
 
     private String password;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<Blacklist> blacklists;
 
     @OneToMany(mappedBy = "author")
     @JsonManagedReference

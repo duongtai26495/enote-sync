@@ -1,5 +1,6 @@
 package com.kai.mynote.config;
 
+import com.kai.mynote.filter.JwtBlacklistFIlter;
 import com.kai.mynote.filter.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,8 @@ public class SecurityConfig {
     @Autowired
     private JwtRequestFilter requestFilter;
 
+    @Autowired
+    private JwtBlacklistFIlter jwtBlacklistFIlter;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -34,6 +37,7 @@ public class SecurityConfig {
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterAfter(jwtBlacklistFIlter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
