@@ -1,6 +1,7 @@
 package com.kai.mynote.util;
 
 
+import com.kai.mynote.assets.AppConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,7 +17,7 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    public static final String SECRET = "5367566B597033733627639792F423F45281482B4D6251655468576D5A71347437";
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -67,22 +68,22 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(userName)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+1000*60*30))
+                .setExpiration(new Date(System.currentTimeMillis()+AppConstants.ACCESS_TOKEN_EXPIRATION_MS))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
         String refresh_token = Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userName)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+6 * 60 * 60 * 1000))
+                .setExpiration(new Date(System.currentTimeMillis()+ AppConstants.REFRESH_TOKEN_EXPIRATION_MS))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
         Map<String, String> tokens = new HashMap<>();
-        tokens.put("accese_token",access_token);
-        tokens.put("refresh_token",refresh_token);
+        tokens.put(AppConstants.ACCESS_TOKEN,access_token);
+        tokens.put(AppConstants.REFRESH_TOKEN,refresh_token);
         return tokens;
     }
 
     private Key getSignKey() {
-        byte[] keyBytes= Decoders.BASE64.decode(SECRET);
+        byte[] keyBytes= Decoders.BASE64.decode(AppConstants.SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

@@ -1,6 +1,7 @@
 package com.kai.mynote.controller;
 
 
+import com.kai.mynote.assets.AppConstants;
 import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.entities.Note;
 import com.kai.mynote.entities.WorkSpace;
@@ -32,11 +33,11 @@ public class NoteController {
         if (note != null &&
             note.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("SUCCESS","Note information", note)
+                    new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.NOTE, note)
             );
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject("FAIL","Bad request",null)
+                new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
         );
     }
 
@@ -48,13 +49,13 @@ public class NoteController {
             if (workSpace !=null && workSpace.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
                 note.setAuthor(userService.getUserForAuthor(authentication.getName()));
                 return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject("SUCCESS","Note created", noteService.create(note))
+                        new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.NOTE +" "+AppConstants.CREATED, noteService.create(note))
                 );
             }
 
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject("FAIL","Bad request",null)
+                new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
         );
     }
 
@@ -69,12 +70,12 @@ public class NoteController {
             if (workSpace.getAuthor().getUsername().equalsIgnoreCase(authorName) &&
                     workspaceService.getWorkspaceById(note.getWorkspace().getId()).getAuthor().getUsername().equals(authorName)) { // Check workspace của note gửi lên có phải của user ko
                 return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject("SUCCESS", "Note updated", noteService.update(note))
+                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE+" "+AppConstants.UPDATED, noteService.update(note))
                 );
             }
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject("FAIL","Bad request",null)
+                new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
         );
     }
 
@@ -85,11 +86,11 @@ public class NoteController {
             if (currentNote.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
                 noteService.removeById(id);
                 return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject("SUCCESS","Note removed", null)
+                        new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.NOTE +" "+AppConstants.REMOVED, null)
                 );
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject("FAIL","Bad request",null)
+                new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
         );
     }
 }

@@ -1,5 +1,6 @@
 package com.kai.mynote.controller;
 
+import com.kai.mynote.assets.AppConstants;
 import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.dto.UserDTO;
 import com.kai.mynote.dto.UserRegisterDTO;
@@ -35,42 +36,38 @@ public class PublicController {
     @PostMapping("/sign-up")
     public ResponseEntity<ResponseObject> signUp(@RequestBody UserRegisterDTO userRegisterDTO) {
         if (userService.isExistByEmail(userRegisterDTO.getEmail())) {
-            return createErrorResponse("This email already taken");
+            return createErrorResponse(AppConstants.EMAIL_TAKEN_WARN);
         }
 
         if (userService.isExistByUsername(userRegisterDTO.getUsername())) {
-            return createErrorResponse("This username already taken");
+            return createErrorResponse(AppConstants.USERNAME_TAKEN_WARN);
         }
 
         UserDTO createdUser = userService.createUser(userRegisterDTO);
         if (createdUser == null) {
-            return createErrorResponse("User Register Fail");
+            return createErrorResponse(AppConstants.REGISTER_FAIL_WARN);
         }
 
-        return createSuccessResponse(createdUser);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.REGISTER_SUCCESS_WARN, createdUser));
     }
 
     private ResponseEntity<ResponseObject> createErrorResponse(String message) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("FAILED", message, null));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, message, null));
     }
 
-    private ResponseEntity<ResponseObject> createSuccessResponse(UserDTO userDTO) {
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS", "User Registered Successfully", userDTO));
-    }
 
     @PostMapping("/sign-in")
     public ResponseEntity<ResponseObject> signIn(@RequestBody UserRegisterDTO userRegisterDTO) throws IOException {
         try {
             authenticateUser(userRegisterDTO.getUsername(), userRegisterDTO.getPassword());
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("FAILED", "User Login Fail", null));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.LOGIN_FAIL_WARN, null));
         }
 
         final UserDetails userDetails = userService.loadUserByUsername(userRegisterDTO.getUsername());
 
-//        final String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
-        return ResponseEntity.ok(new ResponseObject("SUCCESS", "User Login Successfully", jwtUtil.generateToken(userDetails.getUsername())));
+        return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.LOGIN_SUCCESS_WARN, jwtUtil.generateToken(userDetails.getUsername())));
     }
 
     private void authenticateUser(String username, String password) throws AuthenticationException {

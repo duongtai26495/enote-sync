@@ -1,5 +1,6 @@
 package com.kai.mynote.config;
 
+import com.kai.mynote.assets.AppConstants;
 import com.kai.mynote.filter.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +31,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->{
                     auth.requestMatchers("/public/**").permitAll();
-                    auth.requestMatchers("/user/**", "/note/**", "/workspace/**").hasRole("USER");
+                    auth.requestMatchers("/user/**", "/note/**", "/workspace/**").hasRole(AppConstants.ROLE_USER_NAME);
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

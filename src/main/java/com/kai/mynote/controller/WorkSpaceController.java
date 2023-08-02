@@ -1,5 +1,6 @@
 package com.kai.mynote.controller;
 
+import com.kai.mynote.assets.AppConstants;
 import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.entities.Note;
 import com.kai.mynote.entities.User;
@@ -50,7 +51,7 @@ public class WorkSpaceController {
             }
             workSpace.setAuthor(userService.getUserForAuthor(authentication.getName()));
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("SUCCESS","Workspace created", workspaceService.create(workSpace))
+                    new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.WORKSPACE+" "+AppConstants.CREATED, workspaceService.create(workSpace))
             );
 
     }
@@ -61,11 +62,11 @@ public class WorkSpaceController {
         WorkSpace ws = workspaceService.getWorkspaceById(workSpace.getId());
         if (ws != null && ws.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("SUCCESS","Workspace updated", workspaceService.update(workSpace))
+                    new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.WORKSPACE +" "+AppConstants.UPDATED, workspaceService.update(workSpace))
             );
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject("FAIL","Bad request",null)
+                new ResponseObject(AppConstants.FAILURE_STATUS,"Bad request",null)
         );
     }
 
@@ -77,16 +78,16 @@ public class WorkSpaceController {
             if (ws.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
                 workspaceService.removeById(id);
                 return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject("SUCCESS","Workspace removed", null)
+                        new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.WORKSPACE +" "+AppConstants.REMOVED, null)
                 );
             }
         }else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ResponseObject("FAIL","Workspace have to empty to remove",null)
+                    new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.WORKSPACE+" have to empty to remove",null)
             );
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject("FAIL","Bad request",null)
+                new ResponseObject(AppConstants.FAILURE_STATUS,"Bad request",null)
         );
     }
 }

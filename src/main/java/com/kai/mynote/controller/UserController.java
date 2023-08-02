@@ -1,6 +1,7 @@
 package com.kai.mynote.controller;
 
 
+import com.kai.mynote.assets.AppConstants;
 import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.dto.UserDTO;
 import com.kai.mynote.dto.UserUpdateDTO;
@@ -26,34 +27,34 @@ public class UserController {
     @GetMapping("info/{username}")
     public ResponseEntity<ResponseObject> getInfoUser(@PathVariable String username, Authentication authentication){
         if ( authentication.getName().equalsIgnoreCase(username)){
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS","User information", userService.getUserByUsername(username)));
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(AppConstants.SUCCESS_STATUS,"User information", userService.getUserByUsername(username)));
         }
         else{
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject("FAILED","Get user information failed", null));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject(AppConstants.FAILURE_STATUS,"Get user information failed", null));
         }
     }
 
     @PutMapping("update")
     public ResponseEntity<ResponseObject> updateUser(@RequestBody UserUpdateDTO updateDTO, Authentication authentication){
         if ( authentication.getName().equalsIgnoreCase(updateDTO.getUsername())){
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS","User updated", userService.updateUser(updateDTO)));
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(AppConstants.SUCCESS_STATUS,"User updated", userService.updateUser(updateDTO)));
         };
         return createErrorResponse();
     }
 
 
     private ResponseEntity<ResponseObject> createErrorResponse() {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject("FAILED", "Not permission", null));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, "Not permission", null));
     }
 
     private ResponseEntity<ResponseObject> createSuccessResponse(UserDTO userDTO) {
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS", "User Registered Successfully", userDTO));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(AppConstants.SUCCESS_STATUS, "User Registered Successfully", userDTO));
     }
 
     @GetMapping("refresh")
     public ResponseEntity<ResponseObject> refreshToken(Authentication authentication, HttpServletRequest request){
         if (getAndAddTokenToBlackList(authentication, request)) {
-            return ResponseEntity.ok(new ResponseObject("SUCCESS", "Refresh token Successfully", jwtUtil.generateToken(authentication.getName())));
+            return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, "Refresh token Successfully", jwtUtil.generateToken(authentication.getName())));
         }
         return createErrorResponse();
     }
@@ -63,7 +64,7 @@ public class UserController {
 
         if ( authentication.getName().equalsIgnoreCase(updateDTO.getUsername())){
             if (getAndAddTokenToBlackList(authentication, request)) {
-                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS", "Password updated", userService.updatePassword(updateDTO)));
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(AppConstants.SUCCESS_STATUS, "Password updated", userService.updatePassword(updateDTO)));
             }
         };
 
@@ -71,11 +72,11 @@ public class UserController {
     }
 
     private boolean getAndAddTokenToBlackList (Authentication authentication, HttpServletRequest request){
-        String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader(AppConstants.AUTH_HEADER);
         String token = null;
         String username = authentication.getName();
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        if (authHeader != null && authHeader.startsWith(AppConstants.BEARER_TOKEN_PREFIX)) {
             token = authHeader.substring(7);
             if (jwtUtil.validateToken(token, userService.loadUserByUsername(username))){
                 userService.addTokenToBlacklist(username, token);
