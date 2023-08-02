@@ -1,14 +1,10 @@
 spring:
-  sql:
-    init:
-      mode: always
   datasource:
     url: jdbc:mysql://localhost:3306/spring_security?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&character_set_server=utf8mb4
     username: root
-    password: 11991199
+    password: 1199
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    defer-datasource-initialization: true
     show-sql: false
     hibernate:
       ddl-auto: update

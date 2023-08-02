@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface BlacklistRepository extends JpaRepository<Blacklist, Long> {
 
-    @Query("SELECT b FROM Blacklist b WHERE b.token = :token AND b.user.username = :username")
-    Blacklist isExistInBlacklist(@Param("token") String token, @Param("username") String username);
+    @Query("SELECT b FROM Blacklist b WHERE b.token = :token AND b.user.id = :id")
+    Blacklist isExistInBlacklist(@Param("id") Long id, @Param("token") String token);
 }

@@ -6,6 +6,7 @@ import com.kai.mynote.dto.UserDTO;
 import com.kai.mynote.dto.UserUpdateDTO;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,10 +56,21 @@ public class UserController {
     }
 
     @PutMapping("update-password")
-    public ResponseEntity<ResponseObject> updatePassword(@RequestBody UserUpdateDTO updateDTO, Authentication authentication){
+    public ResponseEntity<ResponseObject> updatePassword(@RequestBody UserUpdateDTO updateDTO, Authentication authentication, HttpServletRequest request){
+
         if ( authentication.getName().equalsIgnoreCase(updateDTO.getUsername())){
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS","User updated", userService.updateUser(updateDTO)));
+            String authHeader = request.getHeader("Authorization");
+            String token = null;
+            String username = authentication.getName();
+
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
+                userService.addTokenToBlacklist(username, token);
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS","Password updated", userService.updatePassword(updateDTO)));
+            }
+            
         };
+
         return createErrorResponse();
     }
 }

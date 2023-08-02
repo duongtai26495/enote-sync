@@ -7,8 +7,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "com.kai.mynote.repository")
-@EntityScan(basePackages = {"com.kai.mynote.entities", "com.kai.mynote.entities"})
 public class MyNoteApplication {
 
 	public static void main(String[] args) {

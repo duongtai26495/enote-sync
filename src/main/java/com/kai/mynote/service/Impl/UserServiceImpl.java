@@ -76,7 +76,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         String firstName = updateDTO.getF_name();
         String lastName = updateDTO.getL_name();
-        String password = updateDTO.getPassword();
 
         if (firstName != null) {
             existingUser.setF_name(firstName);
@@ -84,9 +83,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (lastName != null) {
             existingUser.setL_name(lastName);
         }
-        if (password != null) {
-            existingUser.setPassword(new BCryptPasswordEncoder().encode(password));
-        }
+
         userRepository.save(existingUser);
 
         return existingUser.convertDTO(existingUser);
@@ -125,12 +122,28 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         blacklist.setToken(token);
         blacklist.setUser(userRepository.findFirstByUsername(username));
         blacklistRepository.save(blacklist);
-        System.out.println("Token added");
     }
 
     @Override
     public Blacklist checkTokenInBlacklist(String username, String token) {
-        return blacklistRepository.isExistInBlacklist(username, token);
+        return blacklistRepository.isExistInBlacklist(getUserByUsername(username).getId(), token);
+    }
+
+    @Override
+    public UserDTO updatePassword(UserUpdateDTO updateDTO) {
+        User existingUser = userRepository.findFirstByUsername(updateDTO.getUsername());
+        if (existingUser == null) {
+            return null;
+        }
+
+        String password = updateDTO.getPassword();
+
+        if (password != null) {
+            existingUser.setPassword(new BCryptPasswordEncoder().encode(password));
+        }
+        userRepository.save(existingUser);
+
+        return existingUser.convertDTO(existingUser);
     }
 
     @Override

@@ -33,4 +33,6 @@ public interface UserService {
     void addTokenToBlacklist(String username, String token);
 
     Blacklist checkTokenInBlacklist(String username, String token);
+
+    UserDTO updatePassword(UserUpdateDTO updateDTO);
 }
