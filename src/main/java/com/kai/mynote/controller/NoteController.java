@@ -14,7 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/note/")
+@RequestMapping("/note")
 public class NoteController {
 
     @Autowired
@@ -26,7 +26,7 @@ public class NoteController {
     @Autowired
     private WorkspaceServiceImpl workspaceService;
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ResponseObject> getNoteById(@PathVariable Long id, Authentication authentication){
         Note note = noteService.getNoteById(id);
         if (note != null &&
@@ -41,11 +41,11 @@ public class NoteController {
     }
 
 
-    @PostMapping("add")
+    @PostMapping("/add")
     public ResponseEntity<ResponseObject> addNote(@RequestBody Note note, Authentication authentication){
         if (note != null && workspaceService.getWorkspaceById(note.getWorkspace().getId()) != null){
             WorkSpace workSpace = workspaceService.getWorkspaceById(note.getWorkspace().getId());
-            if (workSpace.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
+            if (workSpace !=null && workSpace.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
                 note.setAuthor(userService.getUserForAuthor(authentication.getName()));
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject("SUCCESS","Note created", noteService.create(note))
@@ -58,7 +58,7 @@ public class NoteController {
         );
     }
 
-    @PutMapping("update")
+    @PutMapping("/update")
     public ResponseEntity<ResponseObject> updateNote(@RequestBody Note note, Authentication authentication){
         Note currentNote = noteService.getNoteById(note.getId());
         String authorName = authentication.getName();
@@ -78,7 +78,7 @@ public class NoteController {
         );
     }
 
-    @DeleteMapping("remove/{id}")
+    @DeleteMapping("/remove/{id}")
     public ResponseEntity<ResponseObject> deleteNote(@PathVariable Long id, Authentication authentication){
         Note currentNote = noteService.getNoteById(id);
 
@@ -92,5 +92,4 @@ public class NoteController {
                 new ResponseObject("FAIL","Bad request",null)
         );
     }
-
 }

@@ -36,10 +36,10 @@ public class User {
     private List<Blacklist> blacklists;
 
     @OneToMany(mappedBy = "author")
-    @JsonManagedReference
     private List<WorkSpace> workspaces;
 
     @OneToMany(mappedBy = "author")
+    @JsonIgnore
     private List<Note> notes;
 
     @ManyToMany(fetch = FetchType.EAGER)

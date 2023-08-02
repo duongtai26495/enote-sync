@@ -4,8 +4,10 @@ import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.dto.UserDTO;
 import com.kai.mynote.dto.UserRegisterDTO;
 import com.kai.mynote.dto.UserUpdateDTO;
+import com.kai.mynote.entities.User;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.util.JwtUtil;
+import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/public/")
+@RequestMapping("/public")
 public class PublicController {
     @Autowired
     private UserServiceImpl userService;
@@ -30,12 +32,7 @@ public class PublicController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @GetMapping("hello")
-    public String hello(){
-        return "Hello";
-    }
-
-    @PostMapping("sign-up")
+    @PostMapping("/sign-up")
     public ResponseEntity<ResponseObject> signUp(@RequestBody UserRegisterDTO userRegisterDTO) {
         if (userService.isExistByEmail(userRegisterDTO.getEmail())) {
             return createErrorResponse("This email already taken");
@@ -61,7 +58,7 @@ public class PublicController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS", "User Registered Successfully", userDTO));
     }
 
-    @PostMapping("sign-in")
+    @PostMapping("/sign-in")
     public ResponseEntity<ResponseObject> signIn(@RequestBody UserRegisterDTO userRegisterDTO) throws IOException {
         try {
             authenticateUser(userRegisterDTO.getUsername(), userRegisterDTO.getPassword());
@@ -79,6 +76,5 @@ public class PublicController {
     private void authenticateUser(String username, String password) throws AuthenticationException {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
     }
-
 
 }
