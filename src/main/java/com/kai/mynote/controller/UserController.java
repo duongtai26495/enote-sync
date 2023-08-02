@@ -51,7 +51,8 @@ public class UserController {
     }
 
     @GetMapping("refresh")
-    public ResponseEntity<ResponseObject> refreshToken(Authentication authentication){
+    public ResponseEntity<ResponseObject> refreshToken(Authentication authentication, HttpServletRequest request){
+        getAndAddTokenToBlackList(authentication, request);
         return ResponseEntity.ok(new ResponseObject("SUCCESS", "User Login Successfully", jwtUtil.generateToken(authentication.getName())));
     }
 
@@ -59,18 +60,22 @@ public class UserController {
     public ResponseEntity<ResponseObject> updatePassword(@RequestBody UserUpdateDTO updateDTO, Authentication authentication, HttpServletRequest request){
 
         if ( authentication.getName().equalsIgnoreCase(updateDTO.getUsername())){
-            String authHeader = request.getHeader("Authorization");
-            String token = null;
-            String username = authentication.getName();
+            getAndAddTokenToBlackList(authentication, request);
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS","Password updated", userService.updatePassword(updateDTO)));
 
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                token = authHeader.substring(7);
-                userService.addTokenToBlacklist(username, token);
-                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("SUCCESS","Password updated", userService.updatePassword(updateDTO)));
-            }
-            
         };
 
         return createErrorResponse();
+    }
+
+    private void getAndAddTokenToBlackList (Authentication authentication, HttpServletRequest request){
+        String authHeader = request.getHeader("Authorization");
+        String token = null;
+        String username = authentication.getName();
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+            userService.addTokenToBlacklist(username, token);
+        }
     }
 }
