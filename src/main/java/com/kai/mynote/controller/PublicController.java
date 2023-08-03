@@ -48,7 +48,7 @@ public class PublicController {
             return createErrorResponse(AppConstants.REGISTER_FAIL_WARN);
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.REGISTER_SUCCESS_WARN, createdUser));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.REGISTER_SUCCESS_WARN, createdUser));
     }
 
     private ResponseEntity<ResponseObject> createErrorResponse(String message) {

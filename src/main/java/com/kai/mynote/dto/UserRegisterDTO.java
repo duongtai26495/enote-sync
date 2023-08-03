@@ -17,5 +17,4 @@ public class UserRegisterDTO {
 
     private String password;
 
-    private Gender gender;
 }

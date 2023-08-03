@@ -61,7 +61,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setL_name(userRegisterDTO.getL_name());
         user.setUsername(userRegisterDTO.getUsername());
         user.setEmail(userRegisterDTO.getEmail());
-        user.setGender(userRegisterDTO.getGender());
         user.setPassword(new BCryptPasswordEncoder().encode(userRegisterDTO.getPassword()));
         User createdUser = userRepository.save(user);
 
