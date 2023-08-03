@@ -34,6 +34,10 @@ public class SecurityConfig {
                     auth.requestMatchers("/user/**", "/note/**", "/workspace/**").hasRole(AppConstants.ROLE_USER_NAME);
                     auth.anyRequest().authenticated();
                 })
+//                .oauth2Login(oauth2Login -> {
+//                    oauth2Login.defaultSuccessUrl("/public/auth/google", true);
+//                    oauth2Login.defaultSuccessUrl("/public/auth/facebook", true);
+//                        })
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }

@@ -32,6 +32,11 @@ public class User {
 
     private String password;
 
+    private Gender gender = Gender.UNKNOWN;
+
+    @Enumerated(EnumType.STRING)
+    private Provider provider = Provider.LOCAL;
+
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Blacklist> blacklists;
@@ -53,6 +58,6 @@ public class User {
     private boolean enabled = true;
 
     public UserDTO convertDTO(User user){
-        return new UserDTO(user.getId(), user.getF_name(), user.getL_name(), user.getEmail(), user.getUsername(), user.isEnabled());
+        return new UserDTO(user.getId(), user.getF_name(), user.getL_name(), user.getEmail(), user.getUsername(),  user.getGender(), user.isEnabled());
     }
 }

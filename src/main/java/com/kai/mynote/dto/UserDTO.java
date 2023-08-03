@@ -1,6 +1,7 @@
 package com.kai.mynote.dto;
 
 
+import com.kai.mynote.entities.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,8 @@ public class UserDTO {
     private String email;
 
     private String username;
+
+    private Gender gender;
 
     private boolean enabled;
 }

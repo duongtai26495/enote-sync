@@ -61,6 +61,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setL_name(userRegisterDTO.getL_name());
         user.setUsername(userRegisterDTO.getUsername());
         user.setEmail(userRegisterDTO.getEmail());
+        user.setGender(userRegisterDTO.getGender());
         user.setPassword(new BCryptPasswordEncoder().encode(userRegisterDTO.getPassword()));
         User createdUser = userRepository.save(user);
 
@@ -73,15 +74,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (existingUser == null) {
             return null;
         }
-
+        Gender gender = updateDTO.getGender();
         String firstName = updateDTO.getF_name();
         String lastName = updateDTO.getL_name();
 
-        if (firstName != null) {
+        if (firstName != null && !firstName.equals(existingUser.getF_name())) {
             existingUser.setF_name(firstName);
         }
-        if (lastName != null) {
+        if (lastName != null && !lastName.equals(existingUser.getL_name())) {
             existingUser.setL_name(lastName);
+        }
+        if (gender != null && !gender.equals(existingUser.getGender())){
+            existingUser.setGender(gender);
         }
 
         userRepository.save(existingUser);
