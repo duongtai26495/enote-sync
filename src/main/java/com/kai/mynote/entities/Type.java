@@ -1,6 +1,6 @@
 package com.kai.mynote.entities;
 
-public enum NoteType {
+public enum Type {
     NOTE,
     CHECK
 }

@@ -25,7 +25,7 @@ public class WorkSpace {
     private String featured_image = "";
 
     @OneToMany(mappedBy = "workspace")
-    @JsonManagedReference
+    @JsonIgnore
     private List<Note> notes;
 
     @ManyToOne

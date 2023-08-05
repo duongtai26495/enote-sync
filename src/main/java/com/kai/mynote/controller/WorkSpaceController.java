@@ -29,14 +29,14 @@ public class WorkSpaceController {
     private UserServiceImpl userService;
 
 
-    @GetMapping("")
+    @GetMapping("/all")
     public Page<WorkSpace> getWsByUsername(Authentication authentication,
                                 @RequestParam(defaultValue = "0") int page,
                                 @RequestParam(defaultValue = "10") int size){
             return userService.getAllWorkspace(authentication.getName(), page, size);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public Page<Note> getNotesByWorkspaceId(@PathVariable Long id, Authentication authentication,
                                             @RequestParam(defaultValue = "0") int page,
                                             @RequestParam(defaultValue = "30") int size) {

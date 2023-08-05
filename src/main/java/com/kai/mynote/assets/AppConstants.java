@@ -15,6 +15,7 @@ public final class AppConstants {
     public static final String NOTE = "note";
     public static final String USER = "user";
     public static final String WORKSPACE = "workspace";
+    public static final String TASK = "task";
     public static final String CREATED = "created";
     public static final String UPDATED = "updated";
     public static final String REMOVED = "removed";

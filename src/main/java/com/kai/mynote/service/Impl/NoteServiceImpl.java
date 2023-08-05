@@ -1,10 +1,15 @@
 package com.kai.mynote.service.Impl;
 
 import com.kai.mynote.entities.Note;
-import com.kai.mynote.entities.NoteType;
+import com.kai.mynote.entities.Task;
+import com.kai.mynote.entities.Type;
 import com.kai.mynote.repository.NoteRepository;
+import com.kai.mynote.repository.TaskRepository;
 import com.kai.mynote.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,13 +18,13 @@ public class NoteServiceImpl implements NoteService {
     @Autowired
     private NoteRepository noteRepository;
 
+    @Autowired
+    private TaskRepository taskRepository;
+
     @Override
     public Note create(Note note) {
-        if (note.getContent() == null){
-            note.setContent("");
-        }
-        if (note.getType() == null){
-            note.setType(NoteType.NOTE);
+        if (note.getName() == null){
+            note.setName("Unnamed note");
         }
         return noteRepository.save(note);
     }
@@ -29,8 +34,8 @@ public class NoteServiceImpl implements NoteService {
         if (noteRepository.findById(note.getId()).isPresent()) {
             Note currentNote = noteRepository.findById(note.getId()).get();
 
-            if (note.getContent() != null && !currentNote.getContent().equalsIgnoreCase(note.getContent()))
-            {currentNote.setContent(note.getContent());}
+            if (note.getName() != null && !currentNote.getName().equalsIgnoreCase(note.getFeatured_image()))
+            {currentNote.setName(note.getName());}
 
             if (note.getFeatured_image() != null && !currentNote.getFeatured_image().equalsIgnoreCase(note.getFeatured_image()))
             {currentNote.setFeatured_image(note.getFeatured_image());}
@@ -38,8 +43,6 @@ public class NoteServiceImpl implements NoteService {
             if (note.getWorkspace() !=null && !currentNote.getWorkspace().equals(note.getWorkspace()))
             {currentNote.setWorkspace(note.getWorkspace());}
 
-            if (note.getType() != null && !currentNote.getType().equals(note.getType()))
-            {currentNote.setType(note.getType());}
 
             currentNote.setEnabled(note.isEnabled());
             currentNote.setDone(note.isDone());
@@ -50,13 +53,59 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public void removeById(Long id) {
+    public void removeNoteById(Long id) {
         if (noteRepository.findById(id).isPresent())
         {noteRepository.deleteById(id);}
     }
 
+
     @Override
     public Note getNoteById(Long id) {
         return noteRepository.findById(id).isPresent() ? noteRepository.findById(id).get() : null ;
+    }
+
+    @Override
+    public Task createTask(Task task) {
+        if (task.getContent() == null)
+            task.setContent("Unnamed task");
+        if (task.getType() == null){
+            task.setType(Type.NOTE);
+        }
+       return taskRepository.save(task);
+    }
+
+    @Override
+    public Task findTaskById(Long id) {
+            return taskRepository.findById(id).isPresent() ? taskRepository.findById(id).get() : null;
+    }
+
+    @Override
+    public Task updateTask(Task task) {
+        if (taskRepository.findById(task.getId()).isPresent()){
+            Task currentTask = taskRepository.findById(task.getId()).get();
+            if (task.getContent()!=null && task.getContent().equals(currentTask.getContent())){
+                currentTask.setContent(task.getContent());
+            }
+            if (task.getType()!=null && task.getType().equals(currentTask.getType())){
+                currentTask.setType(task.getType());
+            }
+            currentTask.setEnabled(task.getNote().isEnabled());
+            currentTask.setDone(task.getNote().isDone());
+            return taskRepository.save(currentTask);
+        }
+        return null;
+    }
+
+    @Override
+    public void removeTaskById(Long id) {
+        if (taskRepository.findById(id).isPresent()){
+            taskRepository.deleteById(id);
+        }
+    }
+
+    @Override
+    public Page<Task> getAllTaskByNoteId(Long id, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return taskRepository.findByNoteId(id, pageable);
     }
 }

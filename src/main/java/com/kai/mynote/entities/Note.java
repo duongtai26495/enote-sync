@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "note")
 @Data
@@ -16,10 +19,8 @@ public class Note {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 5000)
-    private String content;
-
-    private NoteType type = NoteType.NOTE;
+    @Column(length = 250)
+    private String name;
 
     private boolean isDone = false;
 
@@ -30,8 +31,11 @@ public class Note {
 
     @ManyToOne
     @JoinColumn(name = "workspace_id")
-    @JsonBackReference
     private WorkSpace workspace;
+
+    @OneToMany(mappedBy = "note")
+    @JsonIgnore
+    List<Task> tasks = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "author_id")
