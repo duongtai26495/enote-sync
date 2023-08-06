@@ -49,6 +49,10 @@ public class User {
     @JsonIgnore
     private List<Note> notes;
 
+    @OneToMany(mappedBy = "author")
+    @JsonIgnore
+    private List<Task> tasks;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_user",

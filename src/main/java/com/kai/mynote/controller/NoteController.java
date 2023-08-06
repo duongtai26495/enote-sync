@@ -103,12 +103,12 @@ public class NoteController {
         );
     }
 
-    @GetMapping("/task/{id}")
+    @GetMapping("/task/get/{id}")
     public ResponseEntity<ResponseObject> getTaskById(@PathVariable Long id,
                                                       Authentication authentication){
         Task task = noteService.findTaskById(id);
         if (task != null &&
-                task.getNote().getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
+                task.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.TASK, task)
             );
@@ -133,6 +133,7 @@ public class NoteController {
         if (task != null && noteService.getNoteById(task.getNote().getId()) != null){
             Note note = noteService.getNoteById(task.getNote().getId());
             if (note !=null && note.getAuthor().getUsername().equals(authentication.getName())){
+                task.setAuthor(userService.getUserForAuthor(authentication.getName()));
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.TASK +" "+AppConstants.CREATED, noteService.createTask(task))
                 );
@@ -149,7 +150,7 @@ public class NoteController {
                                                      Authentication authentication){
         Task currentTask = noteService.findTaskById(task.getId());
         String authorName = authentication.getName();
-            if (currentTask != null && authorName.equals(currentTask.getNote().getAuthor().getUsername())) {
+            if (currentTask != null && authorName.equals(currentTask.getAuthor().getUsername())) {
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.TASK + " " + AppConstants.UPDATED, noteService.updateTask(task))
                 );
@@ -165,7 +166,7 @@ public class NoteController {
                                                      Authentication authentication){
         Task currentTask = noteService.findTaskById(id);
 
-        if (currentTask != null && currentTask.getNote().getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
+        if (currentTask != null && currentTask.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
             noteService.removeTaskById(id);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.TASK +" "+AppConstants.REMOVED, null)

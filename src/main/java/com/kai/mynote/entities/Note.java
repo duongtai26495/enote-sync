@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,8 @@ public class Note {
 
     private boolean enabled = true;
 
+    private double progress = 0.0;
+
     @Column(length = 1000)
     private String featured_image = "";
 
@@ -41,4 +44,6 @@ public class Note {
     @JoinColumn(name = "author_id")
     @JsonIgnore
     private User author;
+
+
 }

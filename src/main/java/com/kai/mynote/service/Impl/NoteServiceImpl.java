@@ -43,9 +43,12 @@ public class NoteServiceImpl implements NoteService {
             if (note.getWorkspace() !=null && !currentNote.getWorkspace().equals(note.getWorkspace()))
             {currentNote.setWorkspace(note.getWorkspace());}
 
+            if (!Double.isNaN(note.getProgress())){
+                currentNote.setProgress(note.getProgress());}
 
             currentNote.setEnabled(note.isEnabled());
             currentNote.setDone(note.isDone());
+
 
             return noteRepository.save(currentNote);
         }
@@ -89,8 +92,8 @@ public class NoteServiceImpl implements NoteService {
             if (task.getType()!=null && task.getType().equals(currentTask.getType())){
                 currentTask.setType(task.getType());
             }
-            currentTask.setEnabled(task.getNote().isEnabled());
-            currentTask.setDone(task.getNote().isDone());
+            currentTask.setEnabled(task.isEnabled());
+            currentTask.setDone(task.isDone());
             return taskRepository.save(currentTask);
         }
         return null;

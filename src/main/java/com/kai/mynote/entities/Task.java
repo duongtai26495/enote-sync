@@ -29,4 +29,10 @@ public class Task {
     @JoinColumn(name = "note_id")
     @JsonBackReference
     private Note note;
+
+
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    @JsonIgnore
+    private User author;
 }
