@@ -16,5 +16,6 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     @Query("SELECT n FROM Note n WHERE n.author.username = :username")
     List<Note> getAllNote(@Param("username") String username);
 
+    @Query("SELECT n FROM Note n WHERE n.workspace.id = :id order by n.id DESC")
     Page<Note> findByWorkspaceId(Long id, Pageable pageable);
 }
