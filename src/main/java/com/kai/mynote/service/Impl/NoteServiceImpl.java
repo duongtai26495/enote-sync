@@ -34,7 +34,7 @@ public class NoteServiceImpl implements NoteService {
         if (noteRepository.findById(note.getId()).isPresent()) {
             Note currentNote = noteRepository.findById(note.getId()).get();
 
-            if (note.getName() != null && !currentNote.getName().equalsIgnoreCase(note.getFeatured_image()))
+            if (note.getName() != null && !currentNote.getName().equalsIgnoreCase(note.getName()))
             {currentNote.setName(note.getName());}
 
             if (note.getFeatured_image() != null && !currentNote.getFeatured_image().equalsIgnoreCase(note.getFeatured_image()))
@@ -86,10 +86,10 @@ public class NoteServiceImpl implements NoteService {
     public Task updateTask(Task task) {
         if (taskRepository.findById(task.getId()).isPresent()){
             Task currentTask = taskRepository.findById(task.getId()).get();
-            if (task.getContent()!=null && task.getContent().equals(currentTask.getContent())){
+            if (task.getContent()!=null && !task.getContent().equals(currentTask.getContent())){
                 currentTask.setContent(task.getContent());
             }
-            if (task.getType()!=null && task.getType().equals(currentTask.getType())){
+            if (task.getType()!=null && !task.getType().equals(currentTask.getType())){
                 currentTask.setType(task.getType());
             }
             currentTask.setEnabled(task.isEnabled());

@@ -37,7 +37,6 @@ public class Note {
     private WorkSpace workspace;
 
     @OneToMany(mappedBy = "note")
-    @JsonIgnore
     List<Task> tasks = new ArrayList<>();
 
     @ManyToOne
