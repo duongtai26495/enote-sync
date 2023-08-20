@@ -37,12 +37,11 @@ public class Note {
     private WorkSpace workspace;
 
     @OneToMany(mappedBy = "note")
-    List<Task> tasks = new ArrayList<>();
+    private List<Task> tasks;
 
     @ManyToOne
     @JoinColumn(name = "author_id")
     @JsonIgnore
     private User author;
-
 
 }
