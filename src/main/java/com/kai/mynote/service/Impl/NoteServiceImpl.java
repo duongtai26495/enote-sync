@@ -12,6 +12,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import static com.kai.mynote.assets.AppConstants.TIME_FORMAT;
+
 @Service
 public class NoteServiceImpl implements NoteService {
 
@@ -26,6 +31,10 @@ public class NoteServiceImpl implements NoteService {
         if (note.getName() == null){
             note.setName("Unnamed note");
         }
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+        note.setCreated_at(dateFormat.format(date));
+        note.setUpdated_at(dateFormat.format(date));
         return noteRepository.save(note);
     }
 
@@ -48,8 +57,9 @@ public class NoteServiceImpl implements NoteService {
 
             currentNote.setEnabled(note.isEnabled());
             currentNote.setDone(note.isDone());
-
-
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+            currentNote.setUpdated_at(dateFormat.format(date));
             return noteRepository.save(currentNote);
         }
         return null;
@@ -69,11 +79,15 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public Task createTask(Task task) {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
         if (task.getContent() == null)
             task.setContent("Unnamed task");
         if (task.getType() == null){
             task.setType(Type.NOTE);
         }
+        task.setCreated_at(dateFormat.format(date));
+        task.setUpdated_at(dateFormat.format(date));
        return taskRepository.save(task);
     }
 
@@ -94,6 +108,9 @@ public class NoteServiceImpl implements NoteService {
             }
             currentTask.setEnabled(task.isEnabled());
             currentTask.setDone(task.isDone());
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+            currentTask.setUpdated_at(dateFormat.format(date));
             return taskRepository.save(currentTask);
         }
         return null;

@@ -4,31 +4,37 @@ import com.kai.mynote.assets.AppConstants;
 import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.dto.UserDTO;
 import com.kai.mynote.dto.UserRegisterDTO;
-import com.kai.mynote.dto.UserUpdateDTO;
-import com.kai.mynote.entities.User;
+import com.kai.mynote.service.Impl.FileServiceImpl;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.util.JwtUtil;
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/public")
 public class PublicController {
+    @Value("${upload.path}")
+    private String uploadPath;
     @Autowired
     private UserServiceImpl userService;
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private FileServiceImpl fileService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -74,4 +80,8 @@ public class PublicController {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
     }
 
+    @GetMapping("/image/{imageName}")
+    public ResponseEntity<byte[]> displayImage(@PathVariable String imageName) {
+        return fileService.getImage(imageName);
+    }
 }

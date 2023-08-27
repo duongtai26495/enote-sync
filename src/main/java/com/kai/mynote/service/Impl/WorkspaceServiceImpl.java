@@ -11,8 +11,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
+
+import static com.kai.mynote.assets.AppConstants.TIME_FORMAT;
 
 @Service
 public class WorkspaceServiceImpl implements WorkspaceService {
@@ -28,7 +32,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         if (workSpace.getName() == null){
             workSpace.setName("Unnamed workspace");
         }
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+        workSpace.setCreated_at(dateFormat.format(date));
         workSpace.setNotes(new ArrayList<>());
+        workSpace.setUpdated_at(dateFormat.format(date));
         return workspaceRepository.save(workSpace);
     }
 
@@ -41,7 +49,9 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
             if (workSpace.getFeatured_image() != null && !currentWs.getFeatured_image().equalsIgnoreCase(workSpace.getFeatured_image()))
             {currentWs.setFeatured_image(workSpace.getFeatured_image());}
-
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+            currentWs.setUpdated_at(dateFormat.format(date));
             return workspaceRepository.save(currentWs);
         }
         return null;

@@ -9,26 +9,21 @@ import com.kai.mynote.entities.*;
 import com.kai.mynote.repository.*;
 import com.kai.mynote.service.UserService;
 import com.kai.mynote.util.JwtUtil;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import static com.kai.mynote.assets.AppConstants.TIME_FORMAT;
 
 
 @Service
@@ -55,6 +50,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDTO createUser(UserRegisterDTO userRegisterDTO) {
         User user = new User();
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
         List<Role> roles = roleRepository.findAll();
         user.setRoles(roles.stream().filter(role -> role.getRole_name().equals(AppConstants.ROLE_PREFIX+AppConstants.ROLE_USER_NAME)).toList());
         user.setF_name(userRegisterDTO.getF_name());
@@ -62,6 +59,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setUsername(userRegisterDTO.getUsername());
         user.setEmail(userRegisterDTO.getEmail());
         user.setPassword(new BCryptPasswordEncoder().encode(userRegisterDTO.getPassword()));
+        user.setJoined_at(dateFormat.format(date));
+        user.setUpdated_at(dateFormat.format(date));
         User createdUser = userRepository.save(user);
 
         return createdUser.convertDTO(createdUser);
@@ -87,6 +86,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             existingUser.setGender(gender);
         }
 
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+        existingUser.setUpdated_at(dateFormat.format(date));
         userRepository.save(existingUser);
 
         return existingUser.convertDTO(existingUser);
@@ -139,6 +141,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             return null;
         }
 
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+        existingUser.setUpdated_at(dateFormat.format(date));
         String password = updateDTO.getPassword();
 
         if (password != null) {

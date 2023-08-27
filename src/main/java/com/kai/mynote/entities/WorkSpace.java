@@ -28,6 +28,10 @@ public class WorkSpace {
     @JsonIgnore
     private List<Note> notes;
 
+    @Column(updatable = false)
+    private String created_at;
+
+    private String updated_at;
     @ManyToOne
     @JoinColumn(name = "author_id")
     @JsonIgnore
