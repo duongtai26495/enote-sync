@@ -24,4 +24,10 @@ public class UserDTO {
     private Gender gender;
 
     private boolean enabled;
+
+    private String updated_at;
+
+    private String joined_at;
+
+    private String profile_image;
 }

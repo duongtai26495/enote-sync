@@ -1,0 +1,11 @@
+# Sử dụng image MySQL
+FROM mysql:latest
+
+# Thiết lập biến môi trường cho MySQL
+ENV MYSQL_ROOT_PASSWORD=1199
+ENV MYSQL_DATABASE=enote
+ENV MYSQL_USER=root
+ENV MYSQL_PASSWORD=1199
+
+# Sao chép các tệp SQL khởi tạo (nếu có)
+COPY init.sql /docker-entrypoint-initdb.d/

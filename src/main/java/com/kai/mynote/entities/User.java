@@ -53,6 +53,15 @@ public class User {
     @JsonIgnore
     private List<Task> tasks;
 
+    @Column(updatable = false)
+    private String joined_at;
+
+    private String updated_at;
+
+    @Column(length = 1000)
+    private String profile_image;
+
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_user",
@@ -63,6 +72,6 @@ public class User {
     private boolean enabled = true;
 
     public UserDTO convertDTO(User user){
-        return new UserDTO(user.getId(), user.getF_name(), user.getL_name(), user.getEmail(), user.getUsername(),  user.getGender(), user.isEnabled());
+        return new UserDTO(user.getId(), user.getF_name(), user.getL_name(), user.getEmail(), user.getUsername(),  user.getGender(), user.isEnabled(), user.getUpdated_at(), user.getJoined_at(), user.getProfile_image());
     }
 }

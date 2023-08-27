@@ -39,7 +39,7 @@ public class WorkSpaceController {
     @GetMapping("/get/{id}")
     public Page<Note> getNotesByWorkspaceId(@PathVariable Long id, Authentication authentication,
                                             @RequestParam(defaultValue = "0") int page,
-                                            @RequestParam(defaultValue = "20") int size) {
+                                            @RequestParam(defaultValue = "12") int size) {
         WorkSpace workSpace = workspaceService.getWorkspaceById(id);
         if (authentication.getName().equalsIgnoreCase(workSpace.getAuthor().getUsername())){
             return workspaceService.getAllNoteByWorkspaceId(id, page, size);

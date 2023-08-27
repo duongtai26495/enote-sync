@@ -6,21 +6,29 @@ import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.entities.Note;
 import com.kai.mynote.entities.Task;
 import com.kai.mynote.entities.WorkSpace;
+import com.kai.mynote.service.Impl.FileServiceImpl;
 import com.kai.mynote.service.Impl.NoteServiceImpl;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.service.Impl.WorkspaceServiceImpl;
-import jakarta.persistence.GeneratedValue;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/note")
 public class NoteController {
 
+    @Autowired
+    private FileServiceImpl fileService;
     @Autowired
     private UserServiceImpl userService;
 
@@ -175,5 +183,41 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
         );
+    }
+
+    @PostMapping("/upload/{id}")
+    public ResponseEntity<ResponseObject> uploadImage(@RequestParam("f_image") MultipartFile file, @PathVariable String id) {
+        try {
+            // Kiểm tra kích thước tệp ảnh
+            long fileSize = file.getSize();
+            if (fileSize > AppConstants.MAX_FILE_SIZE) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+                );
+            }
+
+            // Kiểm tra xem tệp có phải là ảnh không
+            if (!fileService.isImage(file)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+                );
+            }
+
+
+            Note note = noteService.getNoteById(Long.parseLong(id));
+            String imageURL = fileService.storeNoteImage(file);
+            note.setFeatured_image(imageURL);
+            // Trả về tên tệp ảnh
+            noteService.update(note);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.NOTE +" "+AppConstants.UPDATED, imageURL)
+            );
+            // Trả về tên tệp ảnh
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+            );
+        }
     }
 }

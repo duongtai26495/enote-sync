@@ -30,6 +30,10 @@ public class Task {
     @JsonBackReference
     private Note note;
 
+    @Column(updatable = false)
+    private String created_at;
+
+    private String updated_at;
 
     @ManyToOne
     @JoinColumn(name = "author_id")
