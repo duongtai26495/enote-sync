@@ -3,9 +3,6 @@ package com.kai.mynote.service;
 import com.kai.mynote.entities.Note;
 import com.kai.mynote.entities.WorkSpace;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface WorkspaceService {
 

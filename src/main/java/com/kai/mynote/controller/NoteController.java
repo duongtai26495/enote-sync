@@ -11,7 +11,6 @@ import com.kai.mynote.service.Impl.NoteServiceImpl;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.service.Impl.WorkspaceServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/note")
@@ -61,7 +58,7 @@ public class NoteController {
             if (workSpace !=null && workSpace.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
                 note.setAuthor(userService.getUserForAuthor(authentication.getName()));
                 return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.NOTE +" "+AppConstants.CREATED, noteService.create(note))
+                        new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.NOTE +" "+AppConstants.CREATED, noteService.createNote(note))
                 );
             }
 
@@ -82,7 +79,7 @@ public class NoteController {
             if (workSpace.getAuthor().getUsername().equalsIgnoreCase(authorName) &&
                     workspaceService.getWorkspaceById(note.getWorkspace().getId()).getAuthor().getUsername().equals(authorName)) { // Check workspace của note gửi lên có phải của user ko
                 return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE+" "+AppConstants.UPDATED, noteService.update(note))
+                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE+" "+AppConstants.UPDATED, noteService.updateNote(note))
                 );
             }
         }
@@ -95,7 +92,7 @@ public class NoteController {
     public ResponseEntity<ResponseObject> deleteNote(@PathVariable Long id, Authentication authentication){
         Note currentNote = noteService.getNoteById(id);
             if (currentNote != null && currentNote.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
-                if (currentNote.getTasks().size() == 0){
+                if (currentNote.getTasks().isEmpty()){
                 noteService.removeNoteById(id);
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE + " " + AppConstants.REMOVED, null)
@@ -208,7 +205,7 @@ public class NoteController {
             String imageURL = fileService.storeNoteImage(file);
             note.setFeatured_image(imageURL);
             // Trả về tên tệp ảnh
-            noteService.update(note);
+            noteService.updateNote(note);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.NOTE +" "+AppConstants.UPDATED, imageURL)
             );

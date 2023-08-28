@@ -1,7 +1,6 @@
 package com.kai.mynote.dto;
 
 
-import com.kai.mynote.entities.Gender;
 import lombok.Data;
 
 @Data

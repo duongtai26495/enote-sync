@@ -3,12 +3,11 @@ package com.kai.mynote.service;
 import com.kai.mynote.entities.Note;
 import com.kai.mynote.entities.Task;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 public interface NoteService {
-    Note create(Note note);
+    Note createNote(Note note);
 
-    Note update(Note note);
+    Note updateNote(Note note);
 
     void removeNoteById (Long id);
 
