@@ -34,7 +34,7 @@ public class WorkSpaceController {
     @GetMapping("/get/{id}")
     public Page<Note> getNotesByWorkspaceId(@PathVariable Long id, Authentication authentication,
                                             @RequestParam(defaultValue = "0") int page,
-                                            @RequestParam(defaultValue = "12") int size) {
+                                            @RequestParam(defaultValue = "30") int size) {
         WorkSpace workSpace = workspaceService.getWorkspaceById(id);
         if (authentication.getName().equalsIgnoreCase(workSpace.getAuthor().getUsername())){
             return workspaceService.getAllNoteByWorkspaceId(id, page, size);
@@ -73,7 +73,7 @@ public class WorkSpaceController {
     public ResponseEntity<ResponseObject> deleteWs(@PathVariable Long id, Authentication authentication){
         WorkSpace ws = workspaceService.getWorkspaceById(id);
         if (ws != null && ws.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
-            if (ws.getNotes().size() == 0){
+            if (ws.getNotes().isEmpty()){
                 workspaceService.removeById(id);
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.WORKSPACE +" "+AppConstants.REMOVED, null)
