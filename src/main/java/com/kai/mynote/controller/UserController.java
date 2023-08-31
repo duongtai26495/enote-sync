@@ -1,7 +1,7 @@
 package com.kai.mynote.controller;
 
 
-import com.kai.mynote.assets.AppConstants;
+import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.dto.UserDTO;
 import com.kai.mynote.dto.UserUpdateDTO;

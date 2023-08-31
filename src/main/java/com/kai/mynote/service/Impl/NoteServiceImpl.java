@@ -13,9 +13,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import static com.kai.mynote.assets.AppConstants.TIME_FORMAT;
+import static com.kai.mynote.util.AppConstants.TIME_FORMAT;
 
 @Service
 public class NoteServiceImpl implements NoteService {
@@ -23,14 +25,16 @@ public class NoteServiceImpl implements NoteService {
     @Autowired
     private NoteRepository noteRepository;
 
+
     @Autowired
     private TaskRepository taskRepository;
 
     @Override
-    public Note create(Note note) {
+    public Note createNote(Note note) {
         if (note.getName() == null){
             note.setName("Unnamed note");
         }
+        note.setTasks(new ArrayList<>());
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
         note.setCreated_at(dateFormat.format(date));
@@ -39,7 +43,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Note update(Note note) {
+    public Note updateNote(Note note) {
         if (noteRepository.findById(note.getId()).isPresent()) {
             Note currentNote = noteRepository.findById(note.getId()).get();
 
@@ -60,6 +64,7 @@ public class NoteServiceImpl implements NoteService {
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
             currentNote.setUpdated_at(dateFormat.format(date));
+
             return noteRepository.save(currentNote);
         }
         return null;
@@ -86,9 +91,14 @@ public class NoteServiceImpl implements NoteService {
         if (task.getType() == null){
             task.setType(Type.NOTE);
         }
+
         task.setCreated_at(dateFormat.format(date));
         task.setUpdated_at(dateFormat.format(date));
-       return taskRepository.save(task);
+        Task createdTask = taskRepository.save(task);
+        if(createdTask.getType() == Type.CHECK){
+            progressCalc(task.getNote().getId());
+        }
+        return createdTask;
     }
 
     @Override
@@ -111,15 +121,25 @@ public class NoteServiceImpl implements NoteService {
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
             currentTask.setUpdated_at(dateFormat.format(date));
-            return taskRepository.save(currentTask);
+            Task taskDone = taskRepository.save(currentTask);
+            Note note = noteRepository.findNoteById(currentTask.getNote().getId());
+            note.setProgress(progressCalc(note.getId()));
+            updateNote(note);
+            return taskDone;
         }
         return null;
     }
 
+
     @Override
     public void removeTaskById(Long id) {
+
         if (taskRepository.findById(id).isPresent()){
+            Task task = taskRepository.findById(id).get();
             taskRepository.deleteById(id);
+            if (task.getType().equals(Type.CHECK)){
+                progressCalc(task.getNote().getId());
+            }
         }
     }
 
@@ -128,4 +148,12 @@ public class NoteServiceImpl implements NoteService {
         Pageable pageable = PageRequest.of(page, size);
         return taskRepository.findByNoteId(id, pageable);
     }
+
+    private double progressCalc(long noteId){
+        List<Task> tasks = taskRepository.findByNoteId(noteId);
+        long tasksNote = tasks.stream().filter(item -> item.getType() == Type.CHECK).count();
+        long isDoneTask = tasks.stream().filter(item -> item.getType() == Type.CHECK && item.isDone()).count();
+        return ((double) isDoneTask / tasksNote) * 100;
+    }
+
 }

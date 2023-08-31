@@ -1,22 +1,17 @@
 package com.kai.mynote.controller;
 
-import com.kai.mynote.assets.AppConstants;
+import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.entities.Note;
-import com.kai.mynote.entities.User;
 import com.kai.mynote.entities.WorkSpace;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.service.Impl.WorkspaceServiceImpl;
-import com.sun.tools.jconsole.JConsoleContext;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/workspace")
@@ -39,10 +34,11 @@ public class WorkSpaceController {
     @GetMapping("/get/{id}")
     public Page<Note> getNotesByWorkspaceId(@PathVariable Long id, Authentication authentication,
                                             @RequestParam(defaultValue = "0") int page,
-                                            @RequestParam(defaultValue = "12") int size) {
+                                            @RequestParam(defaultValue = "30") int size,
+                                            @RequestParam(defaultValue = AppConstants.LAST_EDITED_DESC_VALUE) String sort) {
         WorkSpace workSpace = workspaceService.getWorkspaceById(id);
         if (authentication.getName().equalsIgnoreCase(workSpace.getAuthor().getUsername())){
-            return workspaceService.getAllNoteByWorkspaceId(id, page, size);
+            return workspaceService.getAllNoteByWorkspaceId(id, page, size, sort);
         }
         return null;
     }
@@ -78,7 +74,7 @@ public class WorkSpaceController {
     public ResponseEntity<ResponseObject> deleteWs(@PathVariable Long id, Authentication authentication){
         WorkSpace ws = workspaceService.getWorkspaceById(id);
         if (ws != null && ws.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
-            if (ws.getNotes().size() == 0){
+            if (ws.getNotes().isEmpty()){
                 workspaceService.removeById(id);
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.WORKSPACE +" "+AppConstants.REMOVED, null)
