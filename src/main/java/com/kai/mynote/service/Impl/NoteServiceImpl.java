@@ -6,7 +6,6 @@ import com.kai.mynote.entities.Type;
 import com.kai.mynote.repository.NoteRepository;
 import com.kai.mynote.repository.TaskRepository;
 import com.kai.mynote.service.NoteService;
-import com.sun.tools.jconsole.JConsoleContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,10 +16,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
-import static com.kai.mynote.assets.AppConstants.TIME_FORMAT;
+import static com.kai.mynote.util.AppConstants.TIME_FORMAT;
 
 @Service
 public class NoteServiceImpl implements NoteService {

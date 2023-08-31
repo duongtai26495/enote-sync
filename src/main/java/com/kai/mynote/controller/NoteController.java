@@ -1,7 +1,7 @@
 package com.kai.mynote.controller;
 
 
-import com.kai.mynote.assets.AppConstants;
+import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.entities.Note;
 import com.kai.mynote.entities.Task;
@@ -19,6 +19,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/note")
@@ -28,10 +32,8 @@ public class NoteController {
     private FileServiceImpl fileService;
     @Autowired
     private UserServiceImpl userService;
-
     @Autowired
     private NoteServiceImpl noteService;
-
     @Autowired
     private WorkspaceServiceImpl workspaceService;
 
@@ -180,6 +182,32 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
         );
+    }
+
+    @GetMapping("/sort_value")
+    public List<Map<String, String>> getSortValue(){
+        List<Map<String, String>> sortValue = new ArrayList<>();
+
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.LAST_EDITED_DESC_LABEL, AppConstants.LAST_EDITED_DESC_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.LAST_EDITED_ASC_LABEL, AppConstants.LAST_EDITED_ASC_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.CREATED_AT_DESC_LABEL, AppConstants.CREATED_AT_DESC_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.CREATED_AT_ASC_LABEL, AppConstants.CREATED_AT_ASC_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.A_Z_LABEL, AppConstants.A_Z_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.Z_A_LABEL, AppConstants.Z_A_VALUE);
+        }});
+
+        return sortValue;
     }
 
     @PostMapping("/upload/{id}")

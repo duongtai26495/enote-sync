@@ -1,6 +1,6 @@
 package com.kai.mynote.service.Impl;
 
-import com.kai.mynote.assets.AppConstants;
+import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.config.MyUserDetails;
 import com.kai.mynote.dto.UserDTO;
 import com.kai.mynote.dto.UserRegisterDTO;
@@ -23,7 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static com.kai.mynote.assets.AppConstants.TIME_FORMAT;
+import static com.kai.mynote.util.AppConstants.TIME_FORMAT;
 
 
 @Service

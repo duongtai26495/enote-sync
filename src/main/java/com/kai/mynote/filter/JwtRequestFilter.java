@@ -1,6 +1,6 @@
 package com.kai.mynote.filter;
 
-import com.kai.mynote.assets.AppConstants;
+import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.util.JwtUtil;
 import jakarta.servlet.FilterChain;

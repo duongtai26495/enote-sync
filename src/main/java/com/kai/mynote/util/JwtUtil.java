@@ -1,7 +1,6 @@
 package com.kai.mynote.util;
 
 
-import com.kai.mynote.assets.AppConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

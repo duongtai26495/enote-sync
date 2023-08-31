@@ -1,4 +1,4 @@
-package com.kai.mynote.assets;
+package com.kai.mynote.util;
 
 public final class AppConstants {
     public static final int ACCESS_TOKEN_EXPIRATION_MS = 24 * 60 * 60 * 1000; // 24 giờ
@@ -64,7 +64,7 @@ public final class AppConstants {
     public static final String FAILED_STORE_EMPTY_FILE = "Failed to store empty file";
     public static final String YOU_CAN_ONLY_UPLOAD_IMAGE = "You can only upload image file";
     public static final String SIZE_UPLOAD_FILE = "Image must be <= 5mb";
-    public static final String CANNOT_STORE_OUSIDE = "Cannot store file ouside current directory";
+    public static final String CANNOT_STORE_OUTSIDE = "Cannot store file outside current directory";
     public static final String STORE_FILE_FAILED = "Failed to store the file";
 
     //diary
@@ -87,8 +87,17 @@ public final class AppConstants {
     public static final String ROLES = "roles";
 
     //sort
-    public static final String LAST_EDITED = "Last edited";
-    public static final String CREATED_AT = "Created at";
-    public static final String A_Z = "A -> Z";
-    public static final String Z_A = "Z -> A";
+    public static final String LAST_EDITED_DESC_LABEL = "Last Edited - Newest";
+    public static final String LAST_EDITED_ASC_LABEL = "Last Edited - Oldest";
+    public static final String CREATED_AT_DESC_LABEL = "Created At - Newest";
+    public static final String CREATED_AT_ASC_LABEL = "Created At - Oldest";
+    public static final String A_Z_LABEL = "Alphabet A -> Z";
+    public static final String Z_A_LABEL = "Alphabet Z -> A";
+
+    public static final String LAST_EDITED_DESC_VALUE = "updated_at_desc";
+    public static final String LAST_EDITED_ASC_VALUE = "updated_at_asc";
+    public static final String CREATED_AT_DESC_VALUE = "created_at_desc";
+    public static final String CREATED_AT_ASC_VALUE = "created_at_asc";
+    public static final String A_Z_VALUE = "a_z";
+    public static final String Z_A_VALUE = "z_a";
 }

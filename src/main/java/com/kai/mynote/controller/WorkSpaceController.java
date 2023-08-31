@@ -1,6 +1,6 @@
 package com.kai.mynote.controller;
 
-import com.kai.mynote.assets.AppConstants;
+import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.entities.Note;
 import com.kai.mynote.entities.WorkSpace;
@@ -34,10 +34,11 @@ public class WorkSpaceController {
     @GetMapping("/get/{id}")
     public Page<Note> getNotesByWorkspaceId(@PathVariable Long id, Authentication authentication,
                                             @RequestParam(defaultValue = "0") int page,
-                                            @RequestParam(defaultValue = "30") int size) {
+                                            @RequestParam(defaultValue = "30") int size,
+                                            @RequestParam(defaultValue = AppConstants.LAST_EDITED_DESC_VALUE) String sort) {
         WorkSpace workSpace = workspaceService.getWorkspaceById(id);
         if (authentication.getName().equalsIgnoreCase(workSpace.getAuthor().getUsername())){
-            return workspaceService.getAllNoteByWorkspaceId(id, page, size);
+            return workspaceService.getAllNoteByWorkspaceId(id, page, size, sort);
         }
         return null;
     }

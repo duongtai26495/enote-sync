@@ -1,6 +1,6 @@
 package com.kai.mynote.service.Impl;
 
-import com.kai.mynote.assets.AppConstants;
+import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.service.FileService;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +42,7 @@ public class FileServiceImpl implements FileService {
             }
         Path destinationFilePath = storageFolder.resolve(Paths.get(generatedFileName)).normalize().toAbsolutePath();
         if (!destinationFilePath.getParent().equals(storageFolder.toAbsolutePath())){
-            throw new RuntimeException(AppConstants.CANNOT_STORE_OUSIDE);
+            throw new RuntimeException(AppConstants.CANNOT_STORE_OUTSIDE);
         }
         // Lưu ảnh vào thư mục upload
         try(InputStream inputStream = file.getInputStream()){

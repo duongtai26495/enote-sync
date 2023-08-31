@@ -10,12 +10,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import com.kai.mynote.util.AppConstants;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.kai.mynote.assets.AppConstants.TIME_FORMAT;
+import static com.kai.mynote.util.AppConstants.TIME_FORMAT;
 
 @Service
 public class WorkspaceServiceImpl implements WorkspaceService {
@@ -68,8 +69,15 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public Page<Note> getAllNoteByWorkspaceId(Long id, int page, int size) {
+    public Page<Note> getAllNoteByWorkspaceId(Long id, int page, int size, String sort) {
         Pageable pageable = PageRequest.of(page,size);
-        return noteRepository.findByWorkspaceId(id, pageable);
+        return switch (sort) {
+            case AppConstants.LAST_EDITED_ASC_VALUE -> noteRepository.findAllByOrderByUpdatedAtAsc(id, pageable);
+            case AppConstants.CREATED_AT_DESC_VALUE -> noteRepository.findAllByOrderByCreatedAtDesc(id, pageable);
+            case AppConstants.CREATED_AT_ASC_VALUE -> noteRepository.findAllByOrderByCreatedAtAsc(id, pageable);
+            case AppConstants.A_Z_VALUE -> noteRepository.findAllByOrderByNameAsc(id, pageable);
+            case AppConstants.Z_A_VALUE -> noteRepository.findAllByOrderByNameDesc(id, pageable);
+            default -> noteRepository.findAllByOrderByUpdatedAtDesc(id, pageable);
+        };
     }
 }

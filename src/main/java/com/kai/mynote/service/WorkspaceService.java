@@ -14,5 +14,5 @@ public interface WorkspaceService {
 
     WorkSpace getWorkspaceById(Long id);
 
-    Page<Note> getAllNoteByWorkspaceId(Long id, int page, int size);
+    Page<Note> getAllNoteByWorkspaceId(Long id, int page, int size, String sort);
 }
