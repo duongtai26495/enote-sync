@@ -6,7 +6,11 @@ import com.kai.mynote.dto.UserUpdateDTO;
 import com.kai.mynote.entities.Blacklist;
 import com.kai.mynote.entities.User;
 import com.kai.mynote.entities.WorkSpace;
+import org.hibernate.mapping.Any;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
+import java.util.Map;
 
 public interface UserService {
     UserDTO createUser(UserRegisterDTO userRegisterDTO);
@@ -28,4 +32,6 @@ public interface UserService {
     Blacklist checkTokenInBlacklist(String username, String token);
 
     UserDTO updatePassword(UserUpdateDTO updateDTO);
+
+    List<Map<String, String>> workspaceAnalytics(long wsId);
 }

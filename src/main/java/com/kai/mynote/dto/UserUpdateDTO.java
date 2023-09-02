@@ -14,4 +14,6 @@ public class UserUpdateDTO {
     private Gender gender;
 
     private String password;
+
+    private String profile_image;
 }

@@ -21,5 +21,5 @@ public interface NoteService {
 
     void removeTaskById(Long id);
 
-    Page<Task> getAllTaskByNoteId(Long id, int page, int size);
+    Page<Task> getAllTaskByNoteId(Long id, int page, int size, String sort);
 }
