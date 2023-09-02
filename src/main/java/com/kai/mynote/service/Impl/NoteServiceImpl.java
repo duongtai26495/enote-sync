@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.kai.mynote.util.AppConstants.TIME_FORMAT;
+import static com.kai.mynote.util.AppConstants.*;
 
 @Service
 public class NoteServiceImpl implements NoteService {
@@ -144,9 +144,13 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Page<Task> getAllTaskByNoteId(Long id, int page, int size) {
+    public Page<Task> getAllTaskByNoteId(Long id, int page, int size, String sort) {
         Pageable pageable = PageRequest.of(page, size);
-        return taskRepository.findByNoteId(id, pageable);
+        return switch (sort) {
+            case CREATED_AT_ASC_VALUE -> taskRepository.findByNoteIdOrderByCreatedAtASC(id, pageable);
+            case CREATED_AT_DESC_VALUE -> taskRepository.findByNoteIdOrderByCreatedAtDESC(id, pageable);
+            default -> taskRepository.findByNoteIdOrderByLastEditedAtDESC(id, pageable);
+        };
     }
 
     private double progressCalc(long noteId){

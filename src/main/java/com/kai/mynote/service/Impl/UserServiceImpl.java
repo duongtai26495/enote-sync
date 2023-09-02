@@ -9,6 +9,7 @@ import com.kai.mynote.entities.*;
 import com.kai.mynote.repository.*;
 import com.kai.mynote.service.UserService;
 import com.kai.mynote.util.JwtUtil;
+import org.hibernate.mapping.Any;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,8 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.kai.mynote.util.AppConstants.TIME_FORMAT;
 
@@ -75,6 +75,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         Gender gender = updateDTO.getGender();
         String firstName = updateDTO.getF_name();
         String lastName = updateDTO.getL_name();
+        String profileImage = updateDTO.getProfile_image();
 
         if (firstName != null && !firstName.equals(existingUser.getF_name())) {
             existingUser.setF_name(firstName);
@@ -84,6 +85,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         if (gender != null && !gender.equals(existingUser.getGender())){
             existingUser.setGender(gender);
+        }
+        if(profileImage != null && !profileImage.equals(existingUser.getProfile_image())){
+            existingUser.setProfile_image(profileImage);
         }
 
         Date date = new Date();
@@ -152,6 +156,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userRepository.save(existingUser);
 
         return existingUser.convertDTO(existingUser);
+    }
+
+    @Override
+    public List<Map<String, String>> workspaceAnalytics(long wsId) {
+
+        List<Map<String, String>> result = new ArrayList<>();
+        result.add(new HashMap<>() {{
+            put("Number of note", noteRepository.findByWorkspaceId(wsId) +"");
+        }});
+
+
+        return result;
     }
 
     @Override

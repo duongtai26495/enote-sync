@@ -130,8 +130,9 @@ public class NoteController {
     public Page<Task> getAllTasksByNoteId (@PathVariable Long id,
                                             Authentication authentication,
                                            @RequestParam(defaultValue = "0") int page,
-                                           @RequestParam(defaultValue = "10") int size){
-        return noteService.getAllTaskByNoteId(id, page, size);
+                                           @RequestParam(defaultValue = "10") int size,
+                                           @RequestParam(defaultValue = AppConstants.LAST_EDITED_DESC_VALUE) String sort){
+        return noteService.getAllTaskByNoteId(id, page, size, sort);
     }
 
     @PostMapping("/task/add")
@@ -205,6 +206,22 @@ public class NoteController {
         }});
         sortValue.add(new HashMap<String, String>() {{
             put(AppConstants.Z_A_LABEL, AppConstants.Z_A_VALUE);
+        }});
+
+        return sortValue;
+    }
+    @GetMapping("/task/sort_value")
+    public List<Map<String, String>> getTaskSortValue(){
+        List<Map<String, String>> sortValue = new ArrayList<>();
+
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.LAST_EDITED_DESC_LABEL, AppConstants.LAST_EDITED_DESC_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.CREATED_AT_DESC_LABEL, AppConstants.CREATED_AT_DESC_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.CREATED_AT_ASC_LABEL, AppConstants.CREATED_AT_ASC_VALUE);
         }});
 
         return sortValue;
