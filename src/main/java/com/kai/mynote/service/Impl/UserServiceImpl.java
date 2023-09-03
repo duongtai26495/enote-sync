@@ -39,6 +39,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private NoteRepository noteRepository;
 
     @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
     private WorkspaceRepository workspaceRepository;
 
     @Autowired
@@ -159,15 +162,32 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public List<Map<String, String>> workspaceAnalytics(long wsId) {
+    public HashMap<String, String> userAnalytics(String username) {
 
-        List<Map<String, String>> result = new ArrayList<>();
-        result.add(new HashMap<>() {{
-            put("Number of note", noteRepository.findByWorkspaceId(wsId) +"");
-        }});
+        HashMap<String, String> result = new HashMap<>();
+        List<Task> tasks = taskRepository.getAllTasksByUsername(username);
+        List<Note> notes = noteRepository.getAllNoteByUsername(username);
+        long tasksCheck = tasks.stream().filter(item -> item.getType() == Type.CHECK).count();
+        long isDoneTask = tasks.stream().filter(item -> item.getType() == Type.CHECK && item.isDone()).count();
+        result.put("workspaces", workspaceRepository.getAllWorkspaceByUsername(username).size()+"");
+        result.put("notes", notes.size()+"");
+        result.put("tasks", tasks.size()+"");
+        result.put("tasksDone", isDoneTask+"");
 
+        result.put("percentageTasks", percentageCalc(isDoneTask,tasksCheck)+"");
+
+        long isDoneNote = notes.stream().filter(Note::isDone).count();
+
+        result.put("percentageNotes", percentageCalc(isDoneNote,notes.size())+"");
 
         return result;
+    }
+
+    private double percentageCalc(long smallNum, long bigNum){
+        if(smallNum > 0 && smallNum < bigNum){
+            return ((double) smallNum / bigNum) * 100;
+        }
+        return 0.0;
     }
 
     @Override

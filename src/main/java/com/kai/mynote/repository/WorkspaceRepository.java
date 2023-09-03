@@ -8,10 +8,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface WorkspaceRepository extends JpaRepository<WorkSpace, Long> {
 
     @Query(value = "SELECT w FROM WorkSpace w WHERE w.author.username = :username")
     Page<WorkSpace> getAllWorkspace(@Param("username") String username, Pageable pageable);
 
+    @Query(value = "SELECT w FROM WorkSpace w WHERE w.author.username = :username")
+    List<WorkSpace> getAllWorkspaceByUsername(@Param("username") String username);
 }

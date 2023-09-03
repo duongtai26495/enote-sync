@@ -17,6 +17,10 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findByNoteId(Long id);
 
+
+    @Query("SELECT t FROM Task t WHERE t.author.username =:username")
+    List<Task> getAllTasksByUsername(String username);
+
     @Query("SELECT t FROM Task t WHERE t.note.id =:id ORDER BY t.updated_at DESC")
     Page<Task> findByNoteIdOrderByLastEditedAtDESC(Long id, Pageable pageable);
 

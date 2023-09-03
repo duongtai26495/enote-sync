@@ -14,7 +14,7 @@ import java.util.List;
 public interface NoteRepository extends JpaRepository<Note, Long> {
 
     @Query("SELECT n FROM Note n WHERE n.author.username = :username")
-    List<Note> getAllNote(@Param("username") String username);
+    List<Note> getAllNoteByUsername(@Param("username") String username);
 
     @Query("SELECT n FROM Note n WHERE n.id = :id")
     Note findNoteById(@Param("id") Long id);

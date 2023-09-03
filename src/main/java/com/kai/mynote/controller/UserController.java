@@ -123,6 +123,13 @@ public class UserController {
         );
     }
 
+    @GetMapping("analytics")
+    private ResponseEntity<ResponseObject> getUserAnalytics(Authentication authentication){
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.USER, userService.userAnalytics(authentication.getName()))
+        );
+    }
+
     private boolean getAndAddTokenToBlackList (Authentication authentication, HttpServletRequest request){
         String authHeader = request.getHeader(AppConstants.AUTH_HEADER);
         String token = null;
