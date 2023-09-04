@@ -1,6 +1,7 @@
 package com.kai.mynote.repository;
 
 import com.kai.mynote.entities.Note;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,6 +23,8 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     @Query("SELECT n FROM Note n WHERE n.workspace.id = :id")
     List<Note> findByWorkspaceId(Long id);
 
+    @Query("SELECT n FROM Note n WHERE n.name LIKE %:name% AND n.author.username LIKE :username ORDER BY n.updated_at DESC")
+    List<Note> findNoteByName(@Param("name") String name, String username, Pageable pageable);
 
     @Query("SELECT n FROM Note n WHERE n.workspace.id = :id ORDER BY n.updated_at DESC")
     Page<Note> findAllByOrderByUpdatedAtDesc(Long id, Pageable pageable);

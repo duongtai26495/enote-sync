@@ -35,4 +35,5 @@ public interface UserService {
     UserDTO updatePassword(UserUpdateDTO updateDTO);
 
     HashMap<String, String> userAnalytics(String username);
+
 }

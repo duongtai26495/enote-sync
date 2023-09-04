@@ -39,154 +39,154 @@ public class NoteController {
 
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<ResponseObject> getNoteById(@PathVariable Long id, Authentication authentication){
+    public ResponseEntity<ResponseObject> getNoteById(@PathVariable Long id, Authentication authentication) {
         Note note = noteService.getNoteById(id);
         if (note != null &&
-            note.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
+                note.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.NOTE, note)
+                    new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE, note)
             );
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+                new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
         );
     }
 
 
     @PostMapping("/add")
-    public ResponseEntity<ResponseObject> addNote(@RequestBody Note note, Authentication authentication){
-        if (note != null && workspaceService.getWorkspaceById(note.getWorkspace().getId()) != null){
+    public ResponseEntity<ResponseObject> addNote(@RequestBody Note note, Authentication authentication) {
+        if (note != null && workspaceService.getWorkspaceById(note.getWorkspace().getId()) != null) {
             WorkSpace workSpace = workspaceService.getWorkspaceById(note.getWorkspace().getId());
-            if (workSpace !=null && workSpace.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
+            if (workSpace != null && workSpace.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
                 note.setAuthor(userService.getUserForAuthor(authentication.getName()));
                 return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.NOTE +" "+AppConstants.CREATED, noteService.createNote(note))
+                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE + " " + AppConstants.CREATED, noteService.createNote(note))
                 );
             }
 
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+                new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
         );
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ResponseObject> updateNote(@RequestBody Note note, Authentication authentication){
+    public ResponseEntity<ResponseObject> updateNote(@RequestBody Note note, Authentication authentication) {
         Note currentNote = noteService.getNoteById(note.getId());
         String authorName = authentication.getName();
-        if (currentNote != null && currentNote.getAuthor().getUsername().equalsIgnoreCase(authorName)){ //Check workspace muốn chuyển tới có phải của user ko
+        if (currentNote != null && currentNote.getAuthor().getUsername().equalsIgnoreCase(authorName)) { //Check workspace muốn chuyển tới có phải của user ko
 
             WorkSpace workSpace = workspaceService.getWorkspaceById(note.getWorkspace().getId());
 
             if (workSpace.getAuthor().getUsername().equalsIgnoreCase(authorName) &&
                     workspaceService.getWorkspaceById(note.getWorkspace().getId()).getAuthor().getUsername().equals(authorName)) { // Check workspace của note gửi lên có phải của user ko
                 return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE+" "+AppConstants.UPDATED, noteService.updateNote(note))
+                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE + " " + AppConstants.UPDATED, noteService.updateNote(note))
                 );
             }
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+                new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
         );
     }
 
     @DeleteMapping("/remove/{id}")
-    public ResponseEntity<ResponseObject> deleteNote(@PathVariable Long id, Authentication authentication){
+    public ResponseEntity<ResponseObject> deleteNote(@PathVariable Long id, Authentication authentication) {
         Note currentNote = noteService.getNoteById(id);
-            if (currentNote != null && currentNote.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
-                if (currentNote.getTasks().isEmpty()){
+        if (currentNote != null && currentNote.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
+            if (currentNote.getTasks().isEmpty()) {
                 noteService.removeNoteById(id);
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE + " " + AppConstants.REMOVED, null)
                 );
-                }else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                            new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.NOTE+" have to empty to remove",null)
-                    );
-                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.NOTE + " have to empty to remove", null)
+                );
+            }
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+                new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
         );
     }
 
     @GetMapping("/task/get/{id}")
     public ResponseEntity<ResponseObject> getTaskById(@PathVariable Long id,
-                                                      Authentication authentication){
+                                                      Authentication authentication) {
         Task task = noteService.findTaskById(id);
         if (task != null &&
-                task.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
+                task.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.TASK, task)
+                    new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.TASK, task)
             );
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+                new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
         );
     }
 
 
     @GetMapping("/tasks/{id}")
-    public Page<Task> getAllTasksByNoteId (@PathVariable Long id,
-                                            Authentication authentication,
-                                           @RequestParam(defaultValue = "0") int page,
-                                           @RequestParam(defaultValue = "10") int size,
-                                           @RequestParam(defaultValue = AppConstants.LAST_EDITED_DESC_VALUE) String sort){
+    public Page<Task> getAllTasksByNoteId(@PathVariable Long id,
+                                          Authentication authentication,
+                                          @RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size,
+                                          @RequestParam(defaultValue = AppConstants.LAST_EDITED_DESC_VALUE) String sort) {
         return noteService.getAllTaskByNoteId(id, page, size, sort);
     }
 
     @PostMapping("/task/add")
     public ResponseEntity<ResponseObject> addTask(@RequestBody Task task,
-                                                  Authentication authentication){
-        if (task != null && noteService.getNoteById(task.getNote().getId()) != null){
+                                                  Authentication authentication) {
+        if (task != null && noteService.getNoteById(task.getNote().getId()) != null) {
             Note note = noteService.getNoteById(task.getNote().getId());
-            if (note !=null && note.getAuthor().getUsername().equals(authentication.getName())){
+            if (note != null && note.getAuthor().getUsername().equals(authentication.getName())) {
                 task.setAuthor(userService.getUserForAuthor(authentication.getName()));
                 return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.TASK +" "+AppConstants.CREATED, noteService.createTask(task))
+                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.TASK + " " + AppConstants.CREATED, noteService.createTask(task))
                 );
             }
 
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+                new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
         );
     }
 
     @PutMapping("/task/update")
     public ResponseEntity<ResponseObject> updateTask(@RequestBody Task task,
-                                                     Authentication authentication){
+                                                     Authentication authentication) {
         Task currentTask = noteService.findTaskById(task.getId());
         String authorName = authentication.getName();
-            if (currentTask != null && authorName.equals(currentTask.getAuthor().getUsername())) {
-                return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.TASK + " " + AppConstants.UPDATED, noteService.updateTask(task))
-                );
-            }
+        if (currentTask != null && authorName.equals(currentTask.getAuthor().getUsername())) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.TASK + " " + AppConstants.UPDATED, noteService.updateTask(task))
+            );
+        }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+                new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
         );
     }
 
     @DeleteMapping("/task/remove/{id}")
     public ResponseEntity<ResponseObject> deleteTask(@PathVariable Long id,
-                                                     Authentication authentication){
+                                                     Authentication authentication) {
         Task currentTask = noteService.findTaskById(id);
 
-        if (currentTask != null && currentTask.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
+        if (currentTask != null && currentTask.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
             noteService.removeTaskById(id);
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.TASK +" "+AppConstants.REMOVED, null)
+                    new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.TASK + " " + AppConstants.REMOVED, null)
             );
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+                new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
         );
     }
 
     @GetMapping("/sort_value")
-    public List<Map<String, String>> getSortValue(){
+    public List<Map<String, String>> getSortValue() {
         List<Map<String, String>> sortValue = new ArrayList<>();
 
         sortValue.add(new HashMap<String, String>() {{
@@ -210,8 +210,9 @@ public class NoteController {
 
         return sortValue;
     }
+
     @GetMapping("/task/sort_value")
-    public List<Map<String, String>> getTaskSortValue(){
+    public List<Map<String, String>> getTaskSortValue() {
         List<Map<String, String>> sortValue = new ArrayList<>();
 
         sortValue.add(new HashMap<String, String>() {{
@@ -234,14 +235,14 @@ public class NoteController {
             long fileSize = file.getSize();
             if (fileSize > AppConstants.MAX_FILE_SIZE) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+                        new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
                 );
             }
 
             // Kiểm tra xem tệp có phải là ảnh không
             if (!fileService.isImage(file)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+                        new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
                 );
             }
 
@@ -252,14 +253,22 @@ public class NoteController {
             // Trả về tên tệp ảnh
             noteService.updateNote(note);
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.NOTE +" "+AppConstants.UPDATED, imageURL)
+                    new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE + " " + AppConstants.UPDATED, imageURL)
             );
             // Trả về tên tệp ảnh
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ResponseObject(AppConstants.FAILURE_STATUS,AppConstants.BAD_REQUEST_MSG,null)
+                    new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
             );
         }
+    }
+
+    @GetMapping("search")
+    private Page<Note> searchNote(@RequestParam(name = "name") String name,
+                                  @RequestParam(defaultValue = "12") int size,
+                                  @RequestParam(defaultValue = "0") int page,
+                                  Authentication authentication) {
+        return noteService.findNoteByName(name, authentication.getName(), size, page);
     }
 }

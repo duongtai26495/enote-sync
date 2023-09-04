@@ -3,6 +3,7 @@ package com.kai.mynote.service;
 import com.kai.mynote.entities.Note;
 import com.kai.mynote.entities.Task;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface NoteService {
     Note createNote(Note note);
@@ -22,4 +23,6 @@ public interface NoteService {
     void removeTaskById(Long id);
 
     Page<Task> getAllTaskByNoteId(Long id, int page, int size, String sort);
+
+    Page<Note> findNoteByName(String name, String username, int size, int page);
 }

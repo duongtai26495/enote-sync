@@ -64,6 +64,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setPassword(new BCryptPasswordEncoder().encode(userRegisterDTO.getPassword()));
         user.setJoined_at(dateFormat.format(date));
         user.setUpdated_at(dateFormat.format(date));
+        user.setGender(userRegisterDTO.getGender());
         User createdUser = userRepository.save(user);
 
         return createdUser.convertDTO(createdUser);
@@ -176,9 +177,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         result.put("percentageTasks", percentageCalc(isDoneTask,tasksCheck)+"");
 
-        long isDoneNote = notes.stream().filter(Note::isDone).count();
+        long isDoneNote = notes.stream().filter(item -> item.getProgress() == 100.0).count();
 
-        result.put("percentageNotes", percentageCalc(isDoneNote,notes.size())+"");
+        result.put("percentageNotes", isDoneNote+"");
 
         return result;
     }

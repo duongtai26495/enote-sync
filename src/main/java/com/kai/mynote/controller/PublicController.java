@@ -81,4 +81,20 @@ public class PublicController {
     public ResponseEntity<byte[]> displayImage(@PathVariable String imageName) {
         return fileService.getImage(imageName);
     }
+
+    @GetMapping("/check-username/{username}")
+    public boolean checkUsernameIsExist(@PathVariable String username){
+        return userService.isExistByUsername(username);
+    }
+    @GetMapping("/check-email/{email}")
+    public boolean checkEmailIsExist(@PathVariable String email){
+        return userService.isExistByEmail(email);
+    }
+    @GetMapping("/recovery/{email}")
+    public ResponseEntity<ResponseObject> recovery(@PathVariable String email){
+        if(userService.isExistByEmail(email)){
+            return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT,null));
+        }
+        return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.EMAIL_NOT_EXIST,null));
+    }
 }

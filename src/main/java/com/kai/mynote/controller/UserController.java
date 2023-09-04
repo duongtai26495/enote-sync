@@ -4,6 +4,7 @@ package com.kai.mynote.controller;
 import com.kai.mynote.entities.Note;
 import com.kai.mynote.entities.User;
 import com.kai.mynote.service.Impl.FileServiceImpl;
+import com.kai.mynote.service.Impl.NoteServiceImpl;
 import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.dto.UserDTO;
@@ -29,6 +30,7 @@ public class UserController {
 
     @Autowired
     private UserServiceImpl userService;
+
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -129,6 +131,7 @@ public class UserController {
                 new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.USER, userService.userAnalytics(authentication.getName()))
         );
     }
+
 
     private boolean getAndAddTokenToBlackList (Authentication authentication, HttpServletRequest request){
         String authHeader = request.getHeader(AppConstants.AUTH_HEADER);

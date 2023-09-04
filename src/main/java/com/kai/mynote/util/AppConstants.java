@@ -12,6 +12,8 @@ public final class AppConstants {
     public static final String SUCCESS_STATUS = "SUCCESS";
     public static final String FAILURE_STATUS = "FAILURE";
     public static final String BAD_REQUEST_MSG = "Bad request";
+    public static final String EMAIL_SENT = "Email sent";
+    public static final String EMAIL_NOT_EXIST = "Email do not exist";
     public static final String NOTE = "note";
     public static final String USER = "user";
     public static final String WORKSPACE = "workspace";

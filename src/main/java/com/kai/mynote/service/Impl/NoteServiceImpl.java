@@ -8,6 +8,7 @@ import com.kai.mynote.repository.TaskRepository;
 import com.kai.mynote.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -151,6 +152,12 @@ public class NoteServiceImpl implements NoteService {
             case CREATED_AT_DESC_VALUE -> taskRepository.findByNoteIdOrderByCreatedAtDESC(id, pageable);
             default -> taskRepository.findByNoteIdOrderByLastEditedAtDESC(id, pageable);
         };
+    }
+
+    @Override
+    public Page<Note> findNoteByName(String name, String username, int size, int page) {
+        Pageable pageable = PageRequest.of(page, size);
+        return new PageImpl<>(noteRepository.findNoteByName(name, username, pageable));
     }
 
     private double progressCalc(long noteId){
