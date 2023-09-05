@@ -107,12 +107,11 @@ public class UserController {
                 UserUpdateDTO userUpdateDTO = new UserUpdateDTO();
                 userUpdateDTO.setProfile_image(imageURL);
                 userUpdateDTO.setUsername(username);
-                // Trả về tên tệp ảnh
+
                 userService.updateUser(userUpdateDTO);
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.USER + " " + AppConstants.UPDATED, imageURL)
                 );
-                // Trả về tên tệp ảnh
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
