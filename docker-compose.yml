@@ -1,0 +1,27 @@
+version : '3'
+
+services:
+    mysql:
+      image: mysql/mysql-server:8.0
+      environment:
+        - MYSQL_ROOT_PASSWORD=1199
+        - MYSQL_DATABASE=ememo_test
+        - MYSQL_USER=root
+        - MYSQL_PASSWORD=1199
+        - TZ=Asia/Ho_Chi_Minh
+      ports:
+        - "3336:3306"
+      volumes:
+        - mysql-data:/var/lib/mysql
+        - ./new.sql:/docker-entrypoint-initdb.d/init.sql
+    web:
+      image: ememo_kai:latest
+      ports:
+        - "8888:8080"
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ememo_test?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=yes&characterEncoding=UTF-8&character_set_server=utf8mb4
+      depends_on:
+        - mysql
+
+volumes:
+  mysql-data:
