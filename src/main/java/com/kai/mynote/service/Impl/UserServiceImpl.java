@@ -11,6 +11,9 @@ import com.kai.mynote.repository.*;
 import com.kai.mynote.service.UserService;
 import com.kai.mynote.util.JwtUtil;
 import com.kai.mynote.util.UserUtil;
+import jakarta.mail.MessagingException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +27,7 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.kai.mynote.util.AppConstants.TIME_FORMAT;
+import static com.kai.mynote.util.AppConstants.TIME_PATTERN;
 
 
 @Service
@@ -49,6 +52,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private BlacklistRepository blacklistRepository;
 
     @Autowired
+    private ActiveCodeRepository codeRepository;
+
+    @Autowired
     private JwtUtil jwtUtil;
 
     @Autowired
@@ -57,11 +63,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     private MailService mailService;
 
+    private static final Logger logger = LogManager.getLogger(UserService.class);
     @Override
-    public UserDTO createUser(UserRegisterDTO userRegisterDTO) {
+    public UserDTO createUser(UserRegisterDTO userRegisterDTO) throws MessagingException {
         User user = new User();
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         List<Role> roles = roleRepository.findAll();
         user.setRoles(roles.stream().filter(role -> role.getRole_name().equals(AppConstants.ROLE_PREFIX+AppConstants.ROLE_USER_NAME)).toList());
         user.setF_name(userRegisterDTO.getF_name());
@@ -72,11 +79,33 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setJoined_at(dateFormat.format(date));
         user.setUpdated_at(dateFormat.format(date));
         user.setGender(userRegisterDTO.getGender());
-        String activeCode = userUtil.generateRandomString();
-        user.setActiveCode(activeCode.toLowerCase());
-        String content_active_mail = String.format(AppConstants.ACTIVE_EMAIL_CONTENT,activeCode);
-//        mailService.sendHtmlEmail(user.getEmail(),AppConstants.SUBJECT_CONTENT,content_active_mail);
-        System.out.println(content_active_mail);
+
+        Date currentDate = new Date();
+        Calendar currentTime = Calendar.getInstance();
+        currentTime.setTime(currentDate);
+
+        Date current = currentTime.getTime();
+
+        Calendar expiredTime = Calendar.getInstance();
+        expiredTime.add(Calendar.MINUTE, 5);
+        Date expired = expiredTime.getTime();
+
+        ActiveCode activeCode = new ActiveCode();
+        activeCode.setUsername(user.getUsername());
+        activeCode.setEmail(user.getEmail());
+        activeCode.setCreatedAt(current);
+        activeCode.setExpiredAt(expired);
+
+
+        activeCode.setCode(userUtil.generateRandomString().toLowerCase());
+        codeRepository.save(activeCode);
+        String content_active_mail = String.format(AppConstants.ACTIVE_EMAIL_CONTENT,activeCode.getCode());
+        try {
+            mailService.sendHtmlEmail(user.getEmail(),AppConstants.SUBJECT_CONTENT,content_active_mail);
+            logger.info("Mail sent to: "+user.getEmail());
+        }catch (MessagingException e) {
+            logger.error("Mail sending error: "+e);
+        }
         User createdUser = userRepository.save(user);
 
         return createdUser.convertDTO(createdUser);
@@ -107,7 +136,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         existingUser.setUpdated_at(dateFormat.format(date));
         userRepository.save(existingUser);
 
@@ -117,6 +146,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDTO getUserByUsername(String username) {
         return new User().convertDTO(userRepository.findFirstByUsername(username));
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findFirstByEmail(email);
     }
 
     @Override
@@ -162,7 +196,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         existingUser.setUpdated_at(dateFormat.format(date));
         String password = updateDTO.getPassword();
 
@@ -197,11 +231,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User setActiveUser(String username, boolean activate) {
-        User user = userRepository.findFirstByUsername(username);
+    public User setActiveUser(String email, boolean activate) {
+        User user = userRepository.findFirstByEmail(email);
         user.setEnabled(activate);
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         user.setUpdated_at(dateFormat.format(date));
         return userRepository.save(user);
     }

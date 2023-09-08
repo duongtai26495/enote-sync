@@ -13,6 +13,7 @@ public final class AppConstants {
     public static final String FAILURE_STATUS = "FAILURE";
     public static final String BAD_REQUEST_MSG = "Bad request";
     public static final String EMAIL_SENT = "Email sent";
+    public static final String CODE_EXPIRED = "Code is expired";
     public static final String EMAIL_NOT_EXIST = "Email do not exist";
     public static final String NOTE = "note";
     public static final String USER = "user";
@@ -31,7 +32,6 @@ public final class AppConstants {
     public static final String BEARER_TOKEN_PREFIX = "Bearer ";
     public static final String ACTIVATED_FAIL = "activated fail";
 
-    public static final String TIME_FORMAT = "MM/dd/yyyy - HH:mm:ss";
 
     public static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 

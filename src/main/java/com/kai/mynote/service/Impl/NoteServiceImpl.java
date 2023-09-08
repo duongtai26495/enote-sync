@@ -37,7 +37,7 @@ public class NoteServiceImpl implements NoteService {
         }
         note.setTasks(new ArrayList<>());
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         note.setCreated_at(dateFormat.format(date));
         note.setUpdated_at(dateFormat.format(date));
         return noteRepository.save(note);
@@ -63,7 +63,7 @@ public class NoteServiceImpl implements NoteService {
             currentNote.setEnabled(note.isEnabled());
             currentNote.setDone(note.isDone());
             Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+            SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
             currentNote.setUpdated_at(dateFormat.format(date));
 
             return noteRepository.save(currentNote);
@@ -86,7 +86,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public Task createTask(Task task) {
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         if (task.getContent() == null)
             task.setContent("Unnamed task");
         if (task.getType() == null){
@@ -120,7 +120,7 @@ public class NoteServiceImpl implements NoteService {
             currentTask.setEnabled(task.isEnabled());
             currentTask.setDone(task.isDone());
             Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+            SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
             currentTask.setUpdated_at(dateFormat.format(date));
             Task taskDone = taskRepository.save(currentTask);
             Note note = noteRepository.findNoteById(currentTask.getNote().getId());

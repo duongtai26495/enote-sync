@@ -16,7 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.kai.mynote.util.AppConstants.TIME_FORMAT;
 
 @Service
 public class WorkspaceServiceImpl implements WorkspaceService {
@@ -33,7 +32,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             workSpace.setName("Unnamed workspace");
         }
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(AppConstants.TIME_PATTERN);
         workSpace.setCreated_at(dateFormat.format(date));
         workSpace.setNotes(new ArrayList<>());
         workSpace.setUpdated_at(dateFormat.format(date));
@@ -50,7 +49,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             if (workSpace.getFeatured_image() != null && !currentWs.getFeatured_image().equalsIgnoreCase(workSpace.getFeatured_image()))
             {currentWs.setFeatured_image(workSpace.getFeatured_image());}
             Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+            SimpleDateFormat dateFormat = new SimpleDateFormat(AppConstants.TIME_PATTERN);
             currentWs.setUpdated_at(dateFormat.format(date));
             return workspaceRepository.save(currentWs);
         }

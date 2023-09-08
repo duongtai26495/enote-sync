@@ -6,6 +6,7 @@ import com.kai.mynote.dto.UserUpdateDTO;
 import com.kai.mynote.entities.Blacklist;
 import com.kai.mynote.entities.User;
 import com.kai.mynote.entities.WorkSpace;
+import jakarta.mail.MessagingException;
 import org.hibernate.mapping.Any;
 import org.springframework.data.domain.Page;
 
@@ -14,11 +15,13 @@ import java.util.List;
 import java.util.Map;
 
 public interface UserService {
-    UserDTO createUser(UserRegisterDTO userRegisterDTO);
+    UserDTO createUser(UserRegisterDTO userRegisterDTO) throws MessagingException;
 
     UserDTO updateUser(UserUpdateDTO updateDTO);
 
     UserDTO getUserByUsername(String username);
+
+    User getUserByEmail(String email);
 
     boolean isExistByEmail(String email);
 

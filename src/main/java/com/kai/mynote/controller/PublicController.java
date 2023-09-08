@@ -1,12 +1,14 @@
 package com.kai.mynote.controller;
 
 import com.kai.mynote.dto.*;
+import com.kai.mynote.entities.ActiveCode;
 import com.kai.mynote.entities.User;
+import com.kai.mynote.service.Impl.ActiveCodeServiceImpl;
 import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.service.Impl.FileServiceImpl;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.util.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.mail.MessagingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import static com.kai.mynote.util.AppConstants.TIME_PATTERN;
 
 @RestController
 @RequestMapping("/public")
@@ -38,10 +46,13 @@ public class PublicController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private ActiveCodeServiceImpl codeService;
+
     private static final Logger logger = LogManager.getLogger(PublicController.class);
 
     @PostMapping("/sign-up")
-    public ResponseEntity<ResponseObject> signUp(@RequestBody UserRegisterDTO userRegisterDTO) {
+    public ResponseEntity<ResponseObject> signUp(@RequestBody UserRegisterDTO userRegisterDTO) throws MessagingException {
         if (userService.isExistByEmail(userRegisterDTO.getEmail())) {
             return createErrorResponse(AppConstants.EMAIL_TAKEN_WARN);
         }
@@ -106,13 +117,22 @@ public class PublicController {
     }
 
     @PostMapping("/activate-account")
-    public ResponseEntity<ResponseObject> activateAccount(@RequestBody ActiveForm activeForm){
-        User user = userService.getUserForAuthor(activeForm.getUsername());
+    public ResponseEntity<ResponseObject> activateAccount(@RequestBody ActiveCode activeCode) throws ParseException {
+        User user = userService.getUserByEmail(activeCode.getEmail());
+        ActiveCode code = codeService.findCodeByCode(activeCode.getCode());
         if (user != null){
-            if(user.getActiveCode().equalsIgnoreCase(activeForm.getActive_code())){
-                userService.setActiveUser(activeForm.getUsername(), true);
-                return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.USER + " " + AppConstants.ACTIVATED,null));
+            if(user.getEmail().equalsIgnoreCase(activeCode.getEmail())){
+                Date currentDate = new Date();
+                Calendar currentTime = Calendar.getInstance();
+                currentTime.setTime(currentDate);
+                Date current = currentTime.getTime();
+
+                if(current.compareTo(code.getExpiredAt()) < 0 ){
+                    userService.setActiveUser(code.getEmail(), true);
+                    return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.USER + " " + AppConstants.ACTIVATED,null));
+                }
             }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.CODE_EXPIRED, null));
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.ACTIVATED_FAIL, null));
     }
