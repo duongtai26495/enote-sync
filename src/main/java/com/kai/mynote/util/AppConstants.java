@@ -118,6 +118,7 @@ public final class AppConstants {
                 <p>Here is your activation code:</p>
                 <p style="font-size: 24px; font-weight: bold; color: #007bff;">%s</p>
                 <p>Please use this code to activate your account.</p>
+                <p style="font-weight:bold;color:red;>This code will expired after 5 minutes.</p>
                 <p>If you did not request this, please ignore this email.</p>
                 <p>Thank you!</p>
             </body>

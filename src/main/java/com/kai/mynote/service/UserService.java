@@ -7,12 +7,9 @@ import com.kai.mynote.entities.Blacklist;
 import com.kai.mynote.entities.User;
 import com.kai.mynote.entities.WorkSpace;
 import jakarta.mail.MessagingException;
-import org.hibernate.mapping.Any;
 import org.springframework.data.domain.Page;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public interface UserService {
     UserDTO createUser(UserRegisterDTO userRegisterDTO) throws MessagingException;
@@ -39,5 +36,7 @@ public interface UserService {
 
     HashMap<String, String> userAnalytics(String username);
 
-    User setActiveUser(String username, boolean activate);
+    void setActiveUser(String username, boolean activate);
+
+    void sendActiveMail(User user);
 }

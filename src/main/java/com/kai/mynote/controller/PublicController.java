@@ -116,6 +116,17 @@ public class PublicController {
         return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.EMAIL_NOT_EXIST,null));
     }
 
+    @PostMapping("/resend-active-mail")
+    public ResponseEntity<ResponseObject> resendActiveMail(@RequestBody ActiveCode activeCode){
+        User user = userService.getUserByEmail(activeCode.getEmail());
+        if(user != null && !user.isEnabled()){
+            logger.info("Resend active email: "+activeCode.getEmail());
+            userService.sendActiveMail(userService.getUserForAuthor(activeCode.getEmail()));
+            return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT,null));
+        }
+        return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.EMAIL_NOT_EXIST,null));
+    }
+
     @PostMapping("/activate-account")
     public ResponseEntity<ResponseObject> activateAccount(@RequestBody ActiveCode activeCode) throws ParseException {
         User user = userService.getUserByEmail(activeCode.getEmail());

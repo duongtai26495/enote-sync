@@ -121,7 +121,6 @@ public class UserController {
                         new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.USER + " " + AppConstants.UPDATED, imageURL)
                 );
             } catch (IOException e) {
-                e.printStackTrace();
                 logger.error("Upload image error: "+e);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                         new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
@@ -147,11 +146,10 @@ public class UserController {
 
     private boolean getAndAddTokenToBlackList (Authentication authentication, HttpServletRequest request){
         String authHeader = request.getHeader(AppConstants.AUTH_HEADER);
-        String token = null;
         String username = authentication.getName();
 
         if (authHeader != null && authHeader.startsWith(AppConstants.BEARER_TOKEN_PREFIX)) {
-            token = authHeader.substring(7);
+            String token = authHeader.substring(7);
             if (jwtUtil.validateToken(token, userService.loadUserByUsername(username))){
                 userService.addTokenToBlacklist(username, token);
                 logger.info("Added token to blacklist: "+username);
