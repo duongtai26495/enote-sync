@@ -80,34 +80,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setUpdated_at(dateFormat.format(date));
         user.setGender(userRegisterDTO.getGender());
 
-        Date currentDate = new Date();
-        Calendar currentTime = Calendar.getInstance();
-        currentTime.setTime(currentDate);
 
-        Date current = currentTime.getTime();
-
-        Calendar expiredTime = Calendar.getInstance();
-        expiredTime.add(Calendar.MINUTE, 5);
-        Date expired = expiredTime.getTime();
-
-        ActiveCode activeCode = new ActiveCode();
-        activeCode.setUsername(user.getUsername());
-        activeCode.setEmail(user.getEmail());
-        activeCode.setCreatedAt(current);
-        activeCode.setExpiredAt(expired);
-
-
-        activeCode.setCode(userUtil.generateRandomString().toLowerCase());
-        codeRepository.save(activeCode);
-        String content_active_mail = String.format(AppConstants.ACTIVE_EMAIL_CONTENT,activeCode.getCode());
-        try {
-            mailService.sendHtmlEmail(user.getEmail(),AppConstants.SUBJECT_CONTENT,content_active_mail);
-            logger.info("Mail sent to: "+user.getEmail());
-        }catch (MessagingException e) {
-            logger.error("Mail sending error: "+e);
-        }
         User createdUser = userRepository.save(user);
-
+        sendActiveMail(user);
         return createdUser.convertDTO(createdUser);
     }
 
@@ -231,13 +206,43 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User setActiveUser(String email, boolean activate) {
+    public void setActiveUser(String email, boolean activate) {
         User user = userRepository.findFirstByEmail(email);
         user.setEnabled(activate);
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         user.setUpdated_at(dateFormat.format(date));
-        return userRepository.save(user);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void sendActiveMail(User user) {
+        Date currentDate = new Date();
+        Calendar currentTime = Calendar.getInstance();
+        currentTime.setTime(currentDate);
+
+        Date current = currentTime.getTime();
+
+        Calendar expiredTime = Calendar.getInstance();
+        expiredTime.add(Calendar.MINUTE, 5);
+        Date expired = expiredTime.getTime();
+
+        ActiveCode activeCode = new ActiveCode();
+        activeCode.setUsername(user.getUsername());
+        activeCode.setEmail(user.getEmail());
+        activeCode.setCreatedAt(current);
+        activeCode.setExpiredAt(expired);
+
+
+        activeCode.setCode(userUtil.generateRandomString().toLowerCase());
+        codeRepository.save(activeCode);
+        String content_active_mail = String.format(AppConstants.ACTIVE_EMAIL_CONTENT,activeCode.getCode());
+        try {
+            mailService.sendHtmlEmail(user.getEmail(),AppConstants.SUBJECT_CONTENT,content_active_mail);
+            logger.info("Mail sent to: "+user.getEmail());
+        }catch (MessagingException e) {
+            logger.error("Mail sending error: "+e);
+        }
     }
 
     private double percentageCalc(long smallNum, long bigNum){
