@@ -29,6 +29,7 @@ public final class AppConstants {
     public static final String REGISTER_SUCCESS_WARN = "User register success";
     public static final String AUTH_HEADER = "Authorization";
     public static final String BEARER_TOKEN_PREFIX = "Bearer ";
+    public static final String ACTIVATED_FAIL = "activated fail";
 
     public static final String TIME_FORMAT = "MM/dd/yyyy - HH:mm:ss";
 
@@ -78,6 +79,8 @@ public final class AppConstants {
     public static final String DIARY_CREATE_SUCCESS = "Diary create successfully";
     public static final String DIARY_FOUND = "Diary found";
 
+    public static final String ACTIVATED = "activated";
+
     //token
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final long EXPIRATION_TIME = 900_000;
@@ -102,4 +105,22 @@ public final class AppConstants {
     public static final String CREATED_AT_ASC_VALUE = "created_at_asc";
     public static final String A_Z_VALUE = "a_z";
     public static final String Z_A_VALUE = "z_a";
+
+    public static final String SUBJECT_CONTENT = "Activate your account";
+    public static final String ACTIVE_EMAIL_CONTENT = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Activate Your Account</title>
+            </head>
+            <body>
+                <h1>Welcome to our application!</h1>
+                <p>Here is your activation code:</p>
+                <p style="font-size: 24px; font-weight: bold; color: #007bff;">%s</p>
+                <p>Please use this code to activate your account.</p>
+                <p>If you did not request this, please ignore this email.</p>
+                <p>Thank you!</p>
+            </body>
+            </html>
+            """;
 }

@@ -10,6 +10,8 @@ import com.kai.mynote.service.Impl.FileServiceImpl;
 import com.kai.mynote.service.Impl.NoteServiceImpl;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.service.Impl.WorkspaceServiceImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -37,12 +39,14 @@ public class NoteController {
     @Autowired
     private WorkspaceServiceImpl workspaceService;
 
+    private static final Logger logger = LogManager.getLogger(NoteController.class);
 
     @GetMapping("/get/{id}")
     public ResponseEntity<ResponseObject> getNoteById(@PathVariable Long id, Authentication authentication) {
         Note note = noteService.getNoteById(id);
         if (note != null &&
                 note.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
+            logger.info("User "+authentication.getName()+" get a note "+id);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE, note)
             );
@@ -59,6 +63,7 @@ public class NoteController {
             WorkSpace workSpace = workspaceService.getWorkspaceById(note.getWorkspace().getId());
             if (workSpace != null && workSpace.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
                 note.setAuthor(userService.getUserForAuthor(authentication.getName()));
+                logger.info("User "+authentication.getName()+" added a note: "+note.getName());
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE + " " + AppConstants.CREATED, noteService.createNote(note))
                 );
@@ -79,10 +84,16 @@ public class NoteController {
             WorkSpace workSpace = workspaceService.getWorkspaceById(note.getWorkspace().getId());
 
             if (workSpace.getAuthor().getUsername().equalsIgnoreCase(authorName) &&
-                    workspaceService.getWorkspaceById(note.getWorkspace().getId()).getAuthor().getUsername().equals(authorName)) { // Check workspace của note gửi lên có phải của user ko
+                    workspaceService.getWorkspaceById(note.getWorkspace().getId()).getAuthor().getUsername().equals(authorName)) {
+
+
+                Note createdNote = noteService.updateNote(note);
+                logger.info("User "+authentication.getName()+" added a note: "+createdNote.getName());
+                // Check workspace của note gửi lên có phải của user ko
                 return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE + " " + AppConstants.UPDATED, noteService.updateNote(note))
+                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE + " " + AppConstants.UPDATED,createdNote)
                 );
+
             }
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -96,6 +107,8 @@ public class NoteController {
         if (currentNote != null && currentNote.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
             if (currentNote.getTasks().isEmpty()) {
                 noteService.removeNoteById(id);
+
+                logger.info("User "+authentication.getName()+" removed a note: "+id);
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE + " " + AppConstants.REMOVED, null)
                 );
@@ -116,6 +129,8 @@ public class NoteController {
         Task task = noteService.findTaskById(id);
         if (task != null &&
                 task.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
+
+            logger.info("User "+authentication.getName()+" get a task: "+id);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.TASK, task)
             );
@@ -132,21 +147,29 @@ public class NoteController {
                                           @RequestParam(defaultValue = "0") int page,
                                           @RequestParam(defaultValue = "10") int size,
                                           @RequestParam(defaultValue = AppConstants.LAST_EDITED_DESC_VALUE) String sort) {
+
+        logger.info("User "+authentication.getName()+" get tasks from note: "+id);
         return noteService.getAllTaskByNoteId(id, page, size, sort);
     }
 
     @PostMapping("/task/add")
     public ResponseEntity<ResponseObject> addTask(@RequestBody Task task,
                                                   Authentication authentication) {
-        if (task != null && noteService.getNoteById(task.getNote().getId()) != null) {
-            Note note = noteService.getNoteById(task.getNote().getId());
-            if (note != null && note.getAuthor().getUsername().equals(authentication.getName())) {
-                task.setAuthor(userService.getUserForAuthor(authentication.getName()));
-                return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.TASK + " " + AppConstants.CREATED, noteService.createTask(task))
-                );
-            }
+        try {
+            if (task != null && noteService.getNoteById(task.getNote().getId()) != null) {
+                Note note = noteService.getNoteById(task.getNote().getId());
+                if (note != null && note.getAuthor().getUsername().equals(authentication.getName())) {
+                    task.setAuthor(userService.getUserForAuthor(authentication.getName()));
+                    Task createdTask = noteService.createTask(task);
+                    logger.info("User "+authentication.getName()+" added a task: " +createdTask.getId());
+                    return ResponseEntity.status(HttpStatus.OK).body(
+                            new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.TASK + " " + AppConstants.CREATED, createdTask)
+                    );
+                }
 
+            }
+        }catch (Exception e){
+            logger.error("Error: "+ e);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
@@ -159,6 +182,7 @@ public class NoteController {
         Task currentTask = noteService.findTaskById(task.getId());
         String authorName = authentication.getName();
         if (currentTask != null && authorName.equals(currentTask.getAuthor().getUsername())) {
+            logger.info("User "+authentication.getName()+" updated a task:"+task.getId());
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.TASK + " " + AppConstants.UPDATED, noteService.updateTask(task))
             );
@@ -176,6 +200,8 @@ public class NoteController {
 
         if (currentTask != null && currentTask.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
             noteService.removeTaskById(id);
+
+            logger.info("User "+authentication.getName()+" removed a task:"+id);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.TASK + " " + AppConstants.REMOVED, null)
             );
@@ -186,7 +212,7 @@ public class NoteController {
     }
 
     @GetMapping("/sort_value")
-    public List<Map<String, String>> getSortValue() {
+    public List<Map<String, String>> getSortValue(Authentication authentication) {
         List<Map<String, String>> sortValue = new ArrayList<>();
 
         sortValue.add(new HashMap<String, String>() {{
@@ -208,11 +234,12 @@ public class NoteController {
             put(AppConstants.Z_A_LABEL, AppConstants.Z_A_VALUE);
         }});
 
+        logger.info("User "+authentication.getName()+" get note sorts");
         return sortValue;
     }
 
     @GetMapping("/task/sort_value")
-    public List<Map<String, String>> getTaskSortValue() {
+    public List<Map<String, String>> getTaskSortValue(Authentication authentication) {
         List<Map<String, String>> sortValue = new ArrayList<>();
 
         sortValue.add(new HashMap<String, String>() {{
@@ -225,15 +252,17 @@ public class NoteController {
             put(AppConstants.CREATED_AT_ASC_LABEL, AppConstants.CREATED_AT_ASC_VALUE);
         }});
 
+        logger.info("User "+authentication.getName()+" get tasks shorts");
         return sortValue;
     }
 
     @PostMapping("/upload/{id}")
-    public ResponseEntity<ResponseObject> uploadImage(@RequestParam("f_image") MultipartFile file, @PathVariable String id) {
+    public ResponseEntity<ResponseObject> uploadImage(@RequestParam("f_image") MultipartFile file, @PathVariable String id, Authentication authentication) {
         try {
             // Kiểm tra kích thước tệp ảnh
             long fileSize = file.getSize();
             if (fileSize > AppConstants.MAX_FILE_SIZE) {
+                logger.warn("User "+authentication.getName()+" uploaded a large file: "+fileSize);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                         new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
                 );
@@ -241,6 +270,7 @@ public class NoteController {
 
             // Kiểm tra xem tệp có phải là ảnh không
             if (!fileService.isImage(file)) {
+                logger.warn("User "+authentication.getName()+" uploaded not an image file");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                         new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
                 );
@@ -269,6 +299,7 @@ public class NoteController {
                                   @RequestParam(defaultValue = "12") int size,
                                   @RequestParam(defaultValue = "0") int page,
                                   Authentication authentication) {
+        logger.warn("User "+authentication.getName()+" searched "+name);
         return noteService.findNoteByName(name, authentication.getName(), size, page);
     }
 }

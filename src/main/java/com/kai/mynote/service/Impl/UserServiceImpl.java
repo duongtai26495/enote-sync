@@ -1,5 +1,6 @@
 package com.kai.mynote.service.Impl;
 
+import com.kai.mynote.service.MailService;
 import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.config.MyUserDetails;
 import com.kai.mynote.dto.UserDTO;
@@ -9,7 +10,7 @@ import com.kai.mynote.entities.*;
 import com.kai.mynote.repository.*;
 import com.kai.mynote.service.UserService;
 import com.kai.mynote.util.JwtUtil;
-import org.hibernate.mapping.Any;
+import com.kai.mynote.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -50,6 +51,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private UserUtil userUtil;
+
+    @Autowired
+    private MailService mailService;
+
     @Override
     public UserDTO createUser(UserRegisterDTO userRegisterDTO) {
         User user = new User();
@@ -65,6 +72,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setJoined_at(dateFormat.format(date));
         user.setUpdated_at(dateFormat.format(date));
         user.setGender(userRegisterDTO.getGender());
+        String activeCode = userUtil.generateRandomString();
+        user.setActiveCode(activeCode.toLowerCase());
+        String content_active_mail = String.format(AppConstants.ACTIVE_EMAIL_CONTENT,activeCode);
+//        mailService.sendHtmlEmail(user.getEmail(),AppConstants.SUBJECT_CONTENT,content_active_mail);
+        System.out.println(content_active_mail);
         User createdUser = userRepository.save(user);
 
         return createdUser.convertDTO(createdUser);
@@ -170,18 +182,28 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         List<Note> notes = noteRepository.getAllNoteByUsername(username);
         long tasksCheck = tasks.stream().filter(item -> item.getType() == Type.CHECK).count();
         long isDoneTask = tasks.stream().filter(item -> item.getType() == Type.CHECK && item.isDone()).count();
-        result.put("workspaces", workspaceRepository.getAllWorkspaceByUsername(username).size()+"");
-        result.put("notes", notes.size()+"");
-        result.put("tasks", tasks.size()+"");
-        result.put("tasksDone", isDoneTask+"");
+        result.put("workspaces", String.valueOf(workspaceRepository.getAllWorkspaceByUsername(username).size()));
+        result.put("notes", String.valueOf(notes.size()));
+        result.put("tasks", String.valueOf(tasks.size()));
+        result.put("tasksDone", String.valueOf(isDoneTask));
 
-        result.put("percentageTasks", percentageCalc(isDoneTask,tasksCheck)+"");
+        result.put("percentageTasks", String.valueOf(percentageCalc(isDoneTask, tasksCheck)));
 
         long isDoneNote = notes.stream().filter(item -> item.getProgress() == 100.0).count();
 
-        result.put("percentageNotes", isDoneNote+"");
+        result.put("percentageNotes", String.valueOf(isDoneNote));
 
         return result;
+    }
+
+    @Override
+    public User setActiveUser(String username, boolean activate) {
+        User user = userRepository.findFirstByUsername(username);
+        user.setEnabled(activate);
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_FORMAT);
+        user.setUpdated_at(dateFormat.format(date));
+        return userRepository.save(user);
     }
 
     private double percentageCalc(long smallNum, long bigNum){

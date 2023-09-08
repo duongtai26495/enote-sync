@@ -1,12 +1,14 @@
 package com.kai.mynote.controller;
 
+import com.kai.mynote.dto.*;
+import com.kai.mynote.entities.User;
 import com.kai.mynote.util.AppConstants;
-import com.kai.mynote.dto.ResponseObject;
-import com.kai.mynote.dto.UserDTO;
-import com.kai.mynote.dto.UserRegisterDTO;
 import com.kai.mynote.service.Impl.FileServiceImpl;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -36,6 +38,8 @@ public class PublicController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    private static final Logger logger = LogManager.getLogger(PublicController.class);
+
     @PostMapping("/sign-up")
     public ResponseEntity<ResponseObject> signUp(@RequestBody UserRegisterDTO userRegisterDTO) {
         if (userService.isExistByEmail(userRegisterDTO.getEmail())) {
@@ -50,7 +54,7 @@ public class PublicController {
         if (createdUser == null) {
             return createErrorResponse(AppConstants.REGISTER_FAIL_WARN);
         }
-
+        logger.info("User created: "+createdUser.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.REGISTER_SUCCESS_WARN, createdUser));
     }
 
@@ -69,8 +73,9 @@ public class PublicController {
 
         final UserDetails userDetails = userService.loadUserByUsername(userRegisterDTO.getUsername());
 
-
-        return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.LOGIN_SUCCESS_WARN, jwtUtil.generateToken(userDetails.getUsername())));
+        String loggedInUsername = userDetails.getUsername();
+        logger.info("User logged in: "+loggedInUsername);
+        return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.LOGIN_SUCCESS_WARN, jwtUtil.generateToken(loggedInUsername)));
     }
 
     private void authenticateUser(String username, String password) throws AuthenticationException {
@@ -90,11 +95,25 @@ public class PublicController {
     public boolean checkEmailIsExist(@PathVariable String email){
         return userService.isExistByEmail(email);
     }
+
     @GetMapping("/recovery/{email}")
     public ResponseEntity<ResponseObject> recovery(@PathVariable String email){
         if(userService.isExistByEmail(email)){
+            logger.info("Recovery email: "+email );
             return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT,null));
         }
         return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.EMAIL_NOT_EXIST,null));
+    }
+
+    @PostMapping("/activate-account")
+    public ResponseEntity<ResponseObject> activateAccount(@RequestBody ActiveForm activeForm){
+        User user = userService.getUserForAuthor(activeForm.getUsername());
+        if (user != null){
+            if(user.getActiveCode().equalsIgnoreCase(activeForm.getActive_code())){
+                userService.setActiveUser(activeForm.getUsername(), true);
+                return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.USER + " " + AppConstants.ACTIVATED,null));
+            }
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.ACTIVATED_FAIL, null));
     }
 }

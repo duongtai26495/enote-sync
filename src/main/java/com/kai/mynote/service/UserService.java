@@ -36,4 +36,5 @@ public interface UserService {
 
     HashMap<String, String> userAnalytics(String username);
 
+    User setActiveUser(String username, boolean activate);
 }

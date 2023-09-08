@@ -6,6 +6,8 @@ import com.kai.mynote.entities.Note;
 import com.kai.mynote.entities.WorkSpace;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.service.Impl.WorkspaceServiceImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -23,11 +25,13 @@ public class WorkSpaceController {
     @Autowired
     private UserServiceImpl userService;
 
+    private static final Logger logger = LogManager.getLogger(WorkSpaceController.class);
 
     @GetMapping("/all")
     public Page<WorkSpace> getWsByUsername(Authentication authentication,
                                 @RequestParam(defaultValue = "0") int page,
                                 @RequestParam(defaultValue = "10") int size){
+            logger.info("User "+authentication.getName()+" just get all workspaces");
             return userService.getAllWorkspace(authentication.getName(), page, size);
     }
 
@@ -38,6 +42,8 @@ public class WorkSpaceController {
                                             @RequestParam(defaultValue = AppConstants.LAST_EDITED_DESC_VALUE) String sort) {
         WorkSpace workSpace = workspaceService.getWorkspaceById(id);
         if (authentication.getName().equalsIgnoreCase(workSpace.getAuthor().getUsername())){
+
+            logger.info("User "+authentication.getName()+" just get workspace by id "+id);
             return workspaceService.getAllNoteByWorkspaceId(id, page, size, sort);
         }
         return null;
@@ -49,6 +55,8 @@ public class WorkSpaceController {
                 workSpace = new WorkSpace();
             }
             workSpace.setAuthor(userService.getUserForAuthor(authentication.getName()));
+
+            logger.info("User "+authentication.getName()+" just added a workspace");
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.WORKSPACE+" "+AppConstants.CREATED, workspaceService.create(workSpace))
             );
@@ -60,6 +68,8 @@ public class WorkSpaceController {
     public ResponseEntity<ResponseObject> updateWs(@RequestBody WorkSpace workSpace, Authentication authentication){
         WorkSpace ws = workspaceService.getWorkspaceById(workSpace.getId());
         if (ws != null && ws.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
+
+            logger.info("User "+authentication.getName()+" just updated a workspace "+workSpace.getId());
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.WORKSPACE +" "+AppConstants.UPDATED, workspaceService.update(workSpace))
             );
@@ -76,6 +86,8 @@ public class WorkSpaceController {
         if (ws != null && ws.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
             if (ws.getNotes().isEmpty()){
                 workspaceService.removeById(id);
+
+                logger.info("User "+authentication.getName()+" just removed a workspace "+id);
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.WORKSPACE +" "+AppConstants.REMOVED, null)
                 );
