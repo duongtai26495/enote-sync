@@ -114,7 +114,7 @@ public final class AppConstants {
                 <title>Activate Your Account</title>
             </head>
             <body>
-                <h1>Welcome to our application!</h1>
+                <h3>Welcome to our application!</h3>
                 <p>Here is your activation code:</p>
                 <p style="font-size: 24px; font-weight: bold; color: #007bff;">%s</p>
                 <p>Please use this code to activate your account.</p>
