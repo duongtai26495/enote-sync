@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -30,6 +31,14 @@ public class User {
     private String password;
 
     private Gender gender = Gender.UNKNOWN;
+
+    private int sendActiveMailCount = 0;
+
+    private int sendRecoveryPwCount = 0;
+
+    private Date lastSendRecoveryEmail;
+
+    private Date lastSendActiveEmail;
 
     @Enumerated(EnumType.STRING)
     private Provider provider = Provider.LOCAL;

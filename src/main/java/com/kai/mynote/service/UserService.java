@@ -12,11 +12,11 @@ import org.springframework.data.domain.Page;
 import java.util.HashMap;
 
 public interface UserService {
-    UserDTO createUser(UserRegisterDTO userRegisterDTO) throws MessagingException;
+    User createUser(UserRegisterDTO userRegisterDTO) throws MessagingException;
 
-    UserDTO updateUser(UserUpdateDTO updateDTO);
+    User updateUser(User user);
 
-    UserDTO getUserByUsername(String username);
+    User getUserByUsername(String username);
 
     User getUserByEmail(String email);
 
@@ -32,11 +32,13 @@ public interface UserService {
 
     Blacklist checkTokenInBlacklist(String username, String token);
 
-    UserDTO updatePassword(UserUpdateDTO updateDTO);
+    void updatePassword(User user);
 
     HashMap<String, String> userAnalytics(String username);
 
     void setActiveUser(String username, boolean activate);
 
     void sendActiveMail(User user);
+
+    void sendRecoveryPwMail(User user);
 }

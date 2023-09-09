@@ -7,6 +7,8 @@ public final class AppConstants {
     public static final String REFRESH_TOKEN = "refresh_token";
     public static final String ACCESS_TOKEN = "access_token";
     public static final String ROLE_PREFIX = "ROLE_";
+    public static final String ACCOUNT_ACTIVATED = "account already activated";
+    public static final String LIMIT_SEND_EMAIL = "This account is archive limit, try again at tomorrow";
     public static final String ROLE_ADMIN_NAME = "ADMIN";
     public static final String ROLE_USER_NAME = "USER";
     public static final String SUCCESS_STATUS = "SUCCESS";
@@ -106,9 +108,9 @@ public final class AppConstants {
     public static final String A_Z_VALUE = "a_z";
     public static final String Z_A_VALUE = "z_a";
 
-    public static final String SUBJECT_CONTENT = "Activate your account";
+    public static final String SUBJECT_ACTIVE_CONTENT = "Activate your account";
+    public static final String SUBJECT_RECOVERY_CONTENT = "Recovery password";
     public static final String ACTIVE_EMAIL_CONTENT = """
-            <!DOCTYPE html>
             <html>
             <head>
                 <title>Activate Your Account</title>
@@ -118,10 +120,60 @@ public final class AppConstants {
                 <p>Here is your activation code:</p>
                 <p style="font-size: 24px; font-weight: bold; color: #007bff;">%s</p>
                 <p>Please use this code to activate your account.</p>
-                <p style="font-weight:bold;color:red;>This code will expired after 5 minutes.</p>
+                <p style="font-weight:bold;color:red;">This code will expired after 5 minutes.</p>
                 <p>If you did not request this, please ignore this email.</p>
                 <p>Thank you!</p>
             </body>
             </html>
             """;
+    public static final String RECOVERY_PASSWORD_EMAIL_CONTENT = """
+            <html lang="en">
+                   <head>
+                       <meta charset="UTF-8">
+                       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                       <title>Mã Code Khôi Phục Mật Khẩu</title>
+                       <style>
+                           /* Thêm CSS để tạo giao diện email hấp dẫn */
+                           body {
+                               font-family: Arial, sans-serif;
+                               background-color: #f4f4f4;
+                               margin: 0;
+                               padding: 0;
+                           }
+                           .container {
+                               max-width: 600px;
+                               margin: 0 auto;
+                               padding: 20px;
+                               background-color: #ffffff;
+                               border-radius: 5px;
+                               box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                           }
+                           h2 {
+                               color: #333;
+                           }
+                           p {
+                               color: #666;
+                           }
+                           .code {
+                               font-size: 24px;
+                               font-weight: bold;
+                               text-align: center;
+                               margin: 20px 0;
+                           }
+                       </style>
+                   </head>
+                   <body>
+                       <div class="container">
+                           <h2>Mã Code Khôi Phục Mật Khẩu</h2>
+                           <p>Xin chào,</p>
+                           <p>Dưới đây là mã code để khôi phục mật khẩu của bạn:</p>
+                           <div class="code">%s</div>
+                           <p style="color:red;font-weight:bold;">Hãy sử dụng mã code này trên trang đặt lại mật khẩu của bạn. Mã này sẽ hết hạn sau 15 phút.</p>
+                           <p>Nếu bạn không thực hiện yêu cầu này, bạn có thể bỏ qua email này.</p>
+                           <p>Cảm ơn bạn!</p>
+                       </div>
+                   </body>
+                   </html>
+            """;
+    public static final int CODE_LENGTH = 10;
 }

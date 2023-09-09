@@ -5,4 +5,7 @@ import com.kai.mynote.entities.ActiveCode;
 public interface ActiveCodeService {
 
     ActiveCode findCodeByCode(String code);
+
+    void updateCode(ActiveCode activeCode);
+
 }

@@ -1,5 +1,6 @@
 package com.kai.mynote.entities;
 
+import com.kai.mynote.util.AppConstants;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +20,7 @@ public class ActiveCode {
 
     private String email;
 
-    @Column(length = 6)
+    @Column(length = AppConstants.CODE_LENGTH)
     private String code;
 
     @Column(updatable = false)
@@ -27,4 +28,9 @@ public class ActiveCode {
 
     @Column(updatable = false)
     private Date createdAt;
+
+    @Enumerated(EnumType.STRING)
+    private CodeTye type;
+
+    private boolean isUsed = false;
 }

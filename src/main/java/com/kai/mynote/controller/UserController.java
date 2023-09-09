@@ -43,7 +43,9 @@ public class UserController {
     public ResponseEntity<ResponseObject> getInfoUser(@PathVariable String username, Authentication authentication){
         if ( authentication.getName().equalsIgnoreCase(username)){
             logger.info("Get infor user: "+username);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(AppConstants.SUCCESS_STATUS,"User information", userService.getUserByUsername(username)));
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject(AppConstants.SUCCESS_STATUS,"User information",
+                    new User().convertDTO(userService.getUserByUsername(username))));
         }
         else{
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject(AppConstants.FAILURE_STATUS,"Get user information failed", null));
@@ -51,10 +53,12 @@ public class UserController {
     }
 
     @PutMapping("update")
-    public ResponseEntity<ResponseObject> updateUser(@RequestBody UserUpdateDTO updateDTO, Authentication authentication){
-        if ( authentication.getName().equalsIgnoreCase(updateDTO.getUsername())){
-            logger.info("User updated: "+updateDTO.getUsername());
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(AppConstants.SUCCESS_STATUS,"User updated", userService.updateUser(updateDTO)));
+    public ResponseEntity<ResponseObject> updateUser(@RequestBody User user, Authentication authentication){
+        if ( authentication.getName().equalsIgnoreCase(user.getUsername())){
+            logger.info("User updated: "+user.getUsername());
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject(AppConstants.SUCCESS_STATUS,"User updated",
+                    new User().convertDTO(userService.updateUser(user))));
         };
         return createErrorResponse();
     }
@@ -75,12 +79,13 @@ public class UserController {
     }
 
     @PutMapping("update-password")
-    public ResponseEntity<ResponseObject> updatePassword(@RequestBody UserUpdateDTO updateDTO, Authentication authentication, HttpServletRequest request){
+    public ResponseEntity<ResponseObject> updatePassword(@RequestBody User user, Authentication authentication, HttpServletRequest request){
 
-        if ( authentication.getName().equalsIgnoreCase(updateDTO.getUsername())){
+        if ( authentication.getName().equalsIgnoreCase(user.getUsername())){
             if (getAndAddTokenToBlackList(authentication, request)) {
                 logger.info("User update password: "+authentication.getName());
-                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(AppConstants.SUCCESS_STATUS, "Password updated", userService.updatePassword(updateDTO)));
+                userService.updatePassword(user);
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(AppConstants.SUCCESS_STATUS, "Password updated", null));
             }
         };
 
@@ -111,11 +116,11 @@ public class UserController {
                 }
 
                 String imageURL = fileService.storeNoteImage(file);
-                UserUpdateDTO userUpdateDTO = new UserUpdateDTO();
-                userUpdateDTO.setProfile_image(imageURL);
-                userUpdateDTO.setUsername(username);
+                User user = new User();
+                user.setProfile_image(imageURL);
+                user.setUsername(username);
 
-                userService.updateUser(userUpdateDTO);
+                userService.updateUser(user);
                 logger.info("User "+username+" uploaded an profile image");
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.USER + " " + AppConstants.UPDATED, imageURL)

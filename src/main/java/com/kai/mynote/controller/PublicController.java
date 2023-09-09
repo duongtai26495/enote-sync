@@ -2,6 +2,7 @@ package com.kai.mynote.controller;
 
 import com.kai.mynote.dto.*;
 import com.kai.mynote.entities.ActiveCode;
+import com.kai.mynote.entities.CodeTye;
 import com.kai.mynote.entities.User;
 import com.kai.mynote.service.Impl.ActiveCodeServiceImpl;
 import com.kai.mynote.util.AppConstants;
@@ -9,6 +10,7 @@ import com.kai.mynote.service.Impl.FileServiceImpl;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.util.JwtUtil;
 import jakarta.mail.MessagingException;
+import jakarta.websocket.server.PathParam;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,12 +63,12 @@ public class PublicController {
             return createErrorResponse(AppConstants.USERNAME_TAKEN_WARN);
         }
 
-        UserDTO createdUser = userService.createUser(userRegisterDTO);
+        User createdUser = userService.createUser(userRegisterDTO);
         if (createdUser == null) {
             return createErrorResponse(AppConstants.REGISTER_FAIL_WARN);
         }
         logger.info("User created: "+createdUser.getUsername());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.REGISTER_SUCCESS_WARN, createdUser));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.REGISTER_SUCCESS_WARN, createdUser.convertDTO(createdUser)));
     }
 
     private ResponseEntity<ResponseObject> createErrorResponse(String message) {
@@ -108,23 +110,68 @@ public class PublicController {
     }
 
     @GetMapping("/recovery/{email}")
-    public ResponseEntity<ResponseObject> recovery(@PathVariable String email){
-        if(userService.isExistByEmail(email)){
-            logger.info("Recovery email: "+email );
-            return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT,null));
-        }
-        return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.EMAIL_NOT_EXIST,null));
+    public ResponseEntity<ResponseObject> recovery(@PathVariable String email) {
+            User user = userService.getUserByEmail(email);
+            if (user != null && user.isEnabled() &&
+                    user.getSendRecoveryPwCount() < 3) {
+                userService.sendRecoveryPwMail(userService.getUserByEmail(email));
+                return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
+            }
+            if (user != null && user.getSendActiveMailCount() >= 3) {
+                Date currentDate = new Date();
+                Calendar currentTime = Calendar.getInstance();
+                currentTime.setTime(currentDate);
+
+                Date current = currentTime.getTime();
+
+                Date lastTime = user.getLastSendActiveEmail();
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(lastTime);
+                calendar.add(Calendar.HOUR, 24);
+                Date lastSent = calendar.getTime();
+
+                if (lastSent.compareTo(current) < 0) {
+                    user.setSendActiveMailCount(0);
+                    userService.updateUser(user);
+                    userService.sendRecoveryPwMail(userService.getUserByEmail(email));
+                    logger.info("Recovery email: " + email);
+                    return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
+                }
+            }
+            return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.EMAIL_NOT_EXIST, null));
     }
 
-    @PostMapping("/resend-active-mail")
-    public ResponseEntity<ResponseObject> resendActiveMail(@RequestBody ActiveCode activeCode){
-        User user = userService.getUserByEmail(activeCode.getEmail());
-        if(user != null && !user.isEnabled()){
-            logger.info("Resend active email: "+activeCode.getEmail());
-            userService.sendActiveMail(userService.getUserForAuthor(activeCode.getEmail()));
-            return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT,null));
+    @GetMapping("/resend-active-mail")
+    public ResponseEntity<ResponseObject> resendActiveMail(@PathParam("email") String email){
+        User user = userService.getUserByEmail(email);
+        if(user != null && !user.isEnabled() &&
+                user.getSendActiveMailCount() < 3) {
+            userService.sendActiveMail(userService.getUserByEmail(email));
+            return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
         }
-        return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.EMAIL_NOT_EXIST,null));
+        if(user != null && user.getSendActiveMailCount() >= 3 ) {
+            Date currentDate = new Date();
+            Calendar currentTime = Calendar.getInstance();
+            currentTime.setTime(currentDate);
+
+            Date current = currentTime.getTime();
+
+            Date lastTime = user.getLastSendActiveEmail();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(lastTime);
+            calendar.add(Calendar.HOUR,24);
+            Date lastSent = calendar.getTime();
+
+            if (lastSent.compareTo(current) < 0) {
+                user.setSendActiveMailCount(0);
+                userService.updateUser(user);
+                userService.sendActiveMail(userService.getUserByEmail(email));
+                logger.info("Resend active email: " + email);
+                return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
+            }
+            return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.LIMIT_SEND_EMAIL,null));
+        }
+        return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.ACCOUNT_ACTIVATED,null));
     }
 
     @PostMapping("/activate-account")
@@ -132,7 +179,8 @@ public class PublicController {
         User user = userService.getUserByEmail(activeCode.getEmail());
         ActiveCode code = codeService.findCodeByCode(activeCode.getCode());
         if (user != null){
-            if(user.getEmail().equalsIgnoreCase(activeCode.getEmail())){
+            if(!code.isUsed() && code.getType().equals(CodeTye.ACTIVE)
+            && user.getEmail().equalsIgnoreCase(activeCode.getEmail())){
                 Date currentDate = new Date();
                 Calendar currentTime = Calendar.getInstance();
                 currentTime.setTime(currentDate);
@@ -140,6 +188,7 @@ public class PublicController {
 
                 if(current.compareTo(code.getExpiredAt()) < 0 ){
                     userService.setActiveUser(code.getEmail(), true);
+                    codeService.updateCode(code);
                     return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.USER + " " + AppConstants.ACTIVATED,null));
                 }
             }
@@ -147,4 +196,28 @@ public class PublicController {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.ACTIVATED_FAIL, null));
     }
+
+    @PostMapping("/recovery-password/{code}")
+    public ResponseEntity<ResponseObject> recoveryPassword(@PathVariable String code, @RequestBody User user) throws ParseException {
+        User currentUser = userService.getUserByEmail(user.getEmail());
+        ActiveCode recoveryCode = codeService.findCodeByCode(code);
+        if (currentUser != null){
+            if(!recoveryCode.isUsed() && recoveryCode.getType().equals(CodeTye.RECOVERY)
+                    && user.getEmail().equalsIgnoreCase(recoveryCode.getEmail())){
+                Date currentDate = new Date();
+                Calendar currentTime = Calendar.getInstance();
+                currentTime.setTime(currentDate);
+                Date current = currentTime.getTime();
+
+                if(current.compareTo(recoveryCode.getExpiredAt()) < 0 ){
+                    codeService.updateCode(recoveryCode);
+                    userService.updatePassword(user);
+                    return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.PASSWORD_UPDATED,null));
+                }
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.CODE_EXPIRED, null));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.USER_FOUND, null));
+    }
+
 }

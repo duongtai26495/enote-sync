@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Autowired
     private ActiveCodeRepository codeRepository;
-
+    
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private static final Logger logger = LogManager.getLogger(UserService.class);
     @Override
-    public UserDTO createUser(UserRegisterDTO userRegisterDTO) throws MessagingException {
+    public User createUser(UserRegisterDTO userRegisterDTO) throws MessagingException {
         User user = new User();
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
@@ -80,22 +80,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setUpdated_at(dateFormat.format(date));
         user.setGender(userRegisterDTO.getGender());
 
-
-        User createdUser = userRepository.save(user);
-        sendActiveMail(user);
-        return createdUser.convertDTO(createdUser);
+        return userRepository.save(user);
     }
 
     @Override
-    public UserDTO updateUser(UserUpdateDTO updateDTO) {
-        User existingUser = userRepository.findFirstByUsername(updateDTO.getUsername());
+    public User updateUser(User user) {
+        User existingUser = userRepository.findFirstByUsername(user.getUsername());
         if (existingUser == null) {
             return null;
         }
-        Gender gender = updateDTO.getGender();
-        String firstName = updateDTO.getF_name();
-        String lastName = updateDTO.getL_name();
-        String profileImage = updateDTO.getProfile_image();
+        Gender gender = user.getGender();
+        String firstName = user.getF_name();
+        String lastName = user.getL_name();
+        String profileImage = user.getProfile_image();
 
         if (firstName != null && !firstName.equals(existingUser.getF_name())) {
             existingUser.setF_name(firstName);
@@ -113,14 +110,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         existingUser.setUpdated_at(dateFormat.format(date));
-        userRepository.save(existingUser);
 
-        return existingUser.convertDTO(existingUser);
+
+        return userRepository.save(existingUser);
     }
 
     @Override
-    public UserDTO getUserByUsername(String username) {
-        return new User().convertDTO(userRepository.findFirstByUsername(username));
+    public User getUserByUsername(String username) {
+        return userRepository.findFirstByUsername(username);
     }
 
     @Override
@@ -164,23 +161,29 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserDTO updatePassword(UserUpdateDTO updateDTO) {
-        User existingUser = userRepository.findFirstByUsername(updateDTO.getUsername());
-        if (existingUser == null) {
-            return null;
+    public void updatePassword(User user) {
+        User existingUser;
+        if(user.getUsername() != null){
+            existingUser = userRepository.findFirstByUsername(user.getUsername());
+        }else{
+            existingUser = userRepository.findFirstByEmail(user.getEmail());
         }
+
+        if (existingUser == null) {
+            return;
+        }
+
 
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         existingUser.setUpdated_at(dateFormat.format(date));
-        String password = updateDTO.getPassword();
+        String password = user.getPassword();
 
         if (password != null) {
             existingUser.setPassword(new BCryptPasswordEncoder().encode(password));
         }
         userRepository.save(existingUser);
 
-        return existingUser.convertDTO(existingUser);
     }
 
     @Override
@@ -213,10 +216,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         user.setUpdated_at(dateFormat.format(date));
         userRepository.save(user);
+
     }
 
     @Override
     public void sendActiveMail(User user) {
+
         Date currentDate = new Date();
         Calendar currentTime = Calendar.getInstance();
         currentTime.setTime(currentDate);
@@ -232,14 +237,52 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         activeCode.setEmail(user.getEmail());
         activeCode.setCreatedAt(current);
         activeCode.setExpiredAt(expired);
+        activeCode.setType(CodeTye.ACTIVE);
 
+        user.setSendActiveMailCount(user.getSendActiveMailCount()+1);
+        user.setLastSendActiveEmail(current);
+        updateUser(user);
 
         activeCode.setCode(userUtil.generateRandomString().toLowerCase());
         codeRepository.save(activeCode);
         String content_active_mail = String.format(AppConstants.ACTIVE_EMAIL_CONTENT,activeCode.getCode());
         try {
-            mailService.sendHtmlEmail(user.getEmail(),AppConstants.SUBJECT_CONTENT,content_active_mail);
-            logger.info("Mail sent to: "+user.getEmail());
+            mailService.sendHtmlEmail(user.getEmail(),AppConstants.SUBJECT_ACTIVE_CONTENT,content_active_mail);
+            logger.info("Mail active sent to: "+user.getEmail());
+        }catch (MessagingException e) {
+            logger.error("Mail sending error: "+e);
+        }
+    }
+
+    @Override
+    public void sendRecoveryPwMail(User user) {
+        Date currentDate = new Date();
+        Calendar currentTime = Calendar.getInstance();
+        currentTime.setTime(currentDate);
+
+        Date current = currentTime.getTime();
+
+        Calendar expiredTime = Calendar.getInstance();
+        expiredTime.add(Calendar.MINUTE, 15);
+        Date expired = expiredTime.getTime();
+
+        ActiveCode activeCode = new ActiveCode();
+        activeCode.setUsername(user.getUsername());
+        activeCode.setEmail(user.getEmail());
+        activeCode.setCreatedAt(current);
+        activeCode.setExpiredAt(expired);
+        activeCode.setType(CodeTye.RECOVERY);
+
+        user.setSendRecoveryPwCount(user.getSendRecoveryPwCount()+1);
+        user.setLastSendRecoveryEmail(current);
+        updateUser(user);
+
+        activeCode.setCode(userUtil.generateRandomString().toLowerCase());
+        codeRepository.save(activeCode);
+        String content_recovery_mail = String.format(AppConstants.RECOVERY_PASSWORD_EMAIL_CONTENT,activeCode.getCode());
+        try {
+            mailService.sendHtmlEmail(user.getEmail(),AppConstants.SUBJECT_RECOVERY_CONTENT,content_recovery_mail);
+            logger.info("Mail recovery sent to: "+user.getEmail());
         }catch (MessagingException e) {
             logger.error("Mail sending error: "+e);
         }

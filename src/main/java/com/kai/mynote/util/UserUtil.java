@@ -7,7 +7,7 @@ import java.util.Random;
 @Component
 public class UserUtil {
         public String generateRandomString() {
-            int length = 6;
+            int length = AppConstants.CODE_LENGTH;
             String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             StringBuilder randomString = new StringBuilder();
 
