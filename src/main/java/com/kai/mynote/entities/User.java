@@ -54,8 +54,7 @@ public class User {
     @JsonIgnore
     private List<Note> notes;
 
-    @Column(length = 6)
-    private String activeCode;
+    private boolean active = false;
 
     @OneToMany(mappedBy = "author")
     @JsonIgnore

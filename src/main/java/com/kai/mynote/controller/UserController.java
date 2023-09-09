@@ -11,6 +11,7 @@ import com.kai.mynote.dto.UserDTO;
 import com.kai.mynote.dto.UserUpdateDTO;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.util.JwtUtil;
+import com.kai.mynote.util.UserUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,11 +38,15 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private UserUtil userUtil;
+
     private static final Logger logger = LogManager.getLogger(UserController.class);
 
     @GetMapping("info/{username}")
     public ResponseEntity<ResponseObject> getInfoUser(@PathVariable String username, Authentication authentication){
-        if ( authentication.getName().equalsIgnoreCase(username)){
+        if ( userUtil.isUserActive(authentication)
+                && authentication.getName().equalsIgnoreCase(username)){
             logger.info("Get infor user: "+username);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS,"User information",
@@ -54,7 +59,8 @@ public class UserController {
 
     @PutMapping("update")
     public ResponseEntity<ResponseObject> updateUser(@RequestBody User user, Authentication authentication){
-        if ( authentication.getName().equalsIgnoreCase(user.getUsername())){
+        if (userUtil.isUserActive(authentication)
+                && authentication.getName().equalsIgnoreCase(user.getUsername())){
             logger.info("User updated: "+user.getUsername());
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS,"User updated",
@@ -71,7 +77,8 @@ public class UserController {
 
     @GetMapping("refresh")
     public ResponseEntity<ResponseObject> refreshToken(Authentication authentication, HttpServletRequest request){
-        if (getAndAddTokenToBlackList(authentication, request)) {
+        if (userUtil.isUserActive(authentication)
+                && getAndAddTokenToBlackList(authentication, request)) {
             logger.info("User refresh token: "+authentication.getName());
             return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, "Refresh token Successfully", jwtUtil.generateToken(authentication.getName())));
         }
@@ -81,7 +88,8 @@ public class UserController {
     @PutMapping("update-password")
     public ResponseEntity<ResponseObject> updatePassword(@RequestBody User user, Authentication authentication, HttpServletRequest request){
 
-        if ( authentication.getName().equalsIgnoreCase(user.getUsername())){
+        if ( userUtil.isUserActive(authentication)
+                && authentication.getName().equalsIgnoreCase(user.getUsername())){
             if (getAndAddTokenToBlackList(authentication, request)) {
                 logger.info("User update password: "+authentication.getName());
                 userService.updatePassword(user);
@@ -96,7 +104,7 @@ public class UserController {
     private ResponseEntity<ResponseObject> uploadProfileImage(@PathVariable String username,
                                                               Authentication authentication,
                                                               @RequestParam("user_profile_image") MultipartFile file){
-        if(authentication.getName().equalsIgnoreCase(username)) {
+        if(userUtil.isUserActive(authentication) && authentication.getName().equalsIgnoreCase(username)) {
             try {
                 // Kiểm tra kích thước tệp ảnh
                 long fileSize = file.getSize();
@@ -141,9 +149,12 @@ public class UserController {
 
     @GetMapping("analytics")
     private ResponseEntity<ResponseObject> getUserAnalytics(Authentication authentication){
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.USER, userService.userAnalytics(authentication.getName()))
-        );
+        if(userUtil.isUserActive(authentication)) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.USER, userService.userAnalytics(authentication.getName()))
+            );
+        }
+        return null;
     }
 
 
