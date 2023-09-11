@@ -6,6 +6,7 @@ import com.kai.mynote.entities.Note;
 import com.kai.mynote.entities.WorkSpace;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.service.Impl.WorkspaceServiceImpl;
+import com.kai.mynote.util.UserUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ public class WorkSpaceController {
 
     @Autowired
     private UserServiceImpl userService;
+    @Autowired
+    private UserUtil userUtil;
 
     private static final Logger logger = LogManager.getLogger(WorkSpaceController.class);
 
@@ -31,8 +34,11 @@ public class WorkSpaceController {
     public Page<WorkSpace> getWsByUsername(Authentication authentication,
                                 @RequestParam(defaultValue = "0") int page,
                                 @RequestParam(defaultValue = "10") int size){
-            logger.info("User "+authentication.getName()+" just get all workspaces");
+        if (userUtil.isUserActive(authentication)) {
+            logger.info("User " + authentication.getName() + " just get all workspaces");
             return userService.getAllWorkspace(authentication.getName(), page, size);
+        }
+        return null;
     }
 
     @GetMapping("/get/{id}")
@@ -41,7 +47,8 @@ public class WorkSpaceController {
                                             @RequestParam(defaultValue = "30") int size,
                                             @RequestParam(defaultValue = AppConstants.LAST_EDITED_DESC_VALUE) String sort) {
         WorkSpace workSpace = workspaceService.getWorkspaceById(id);
-        if (authentication.getName().equalsIgnoreCase(workSpace.getAuthor().getUsername())){
+        if (userUtil.isUserActive(authentication)
+        && authentication.getName().equalsIgnoreCase(workSpace.getAuthor().getUsername())){
 
             logger.info("User "+authentication.getName()+" just get workspace by id "+id);
             return workspaceService.getAllNoteByWorkspaceId(id, page, size, sort);
@@ -54,20 +61,24 @@ public class WorkSpaceController {
             if (workSpace == null){
                 workSpace = new WorkSpace();
             }
-            workSpace.setAuthor(userService.getUserForAuthor(authentication.getName()));
+            if (userUtil.isUserActive(authentication)) {
+                workSpace.setAuthor(userService.getUserForAuthor(authentication.getName()));
 
-            logger.info("User "+authentication.getName()+" just added a workspace");
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject(AppConstants.SUCCESS_STATUS,AppConstants.WORKSPACE+" "+AppConstants.CREATED, workspaceService.create(workSpace))
-            );
-
+                logger.info("User " + authentication.getName() + " just added a workspace");
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.WORKSPACE + " " + AppConstants.CREATED, workspaceService.create(workSpace))
+                );
+            }
+            return null;
     }
 
 
     @PutMapping("/update")
     public ResponseEntity<ResponseObject> updateWs(@RequestBody WorkSpace workSpace, Authentication authentication){
         WorkSpace ws = workspaceService.getWorkspaceById(workSpace.getId());
-        if (ws != null && ws.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
+        if (ws != null
+                && userUtil.isUserActive(authentication)
+                && ws.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
 
             logger.info("User "+authentication.getName()+" just updated a workspace "+workSpace.getId());
             return ResponseEntity.status(HttpStatus.OK).body(
@@ -83,7 +94,9 @@ public class WorkSpaceController {
     @DeleteMapping("/remove/{id}")
     public ResponseEntity<ResponseObject> deleteWs(@PathVariable Long id, Authentication authentication){
         WorkSpace ws = workspaceService.getWorkspaceById(id);
-        if (ws != null && ws.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
+        if (ws != null
+                && userUtil.isUserActive(authentication)
+                && ws.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())){
             if (ws.getNotes().isEmpty()){
                 workspaceService.removeById(id);
 

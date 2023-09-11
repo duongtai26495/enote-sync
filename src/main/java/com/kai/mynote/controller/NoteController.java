@@ -10,6 +10,7 @@ import com.kai.mynote.service.Impl.FileServiceImpl;
 import com.kai.mynote.service.Impl.NoteServiceImpl;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.service.Impl.WorkspaceServiceImpl;
+import com.kai.mynote.util.UserUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +39,17 @@ public class NoteController {
     private NoteServiceImpl noteService;
     @Autowired
     private WorkspaceServiceImpl workspaceService;
+    @Autowired
+    private UserUtil userUtil;
 
     private static final Logger logger = LogManager.getLogger(NoteController.class);
 
     @GetMapping("/get/{id}")
     public ResponseEntity<ResponseObject> getNoteById(@PathVariable Long id, Authentication authentication) {
         Note note = noteService.getNoteById(id);
-        if (note != null &&
-                note.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
+        if (note != null
+                && userUtil.isUserActive(authentication)
+                && note.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
             logger.info("User "+authentication.getName()+" get a note "+id);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE, note)
@@ -59,7 +63,9 @@ public class NoteController {
 
     @PostMapping("/add")
     public ResponseEntity<ResponseObject> addNote(@RequestBody Note note, Authentication authentication) {
-        if (note != null && workspaceService.getWorkspaceById(note.getWorkspace().getId()) != null) {
+        if (note != null
+                && userUtil.isUserActive(authentication)
+                && workspaceService.getWorkspaceById(note.getWorkspace().getId()) != null) {
             WorkSpace workSpace = workspaceService.getWorkspaceById(note.getWorkspace().getId());
             if (workSpace != null && workSpace.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
                 note.setAuthor(userService.getUserForAuthor(authentication.getName()));
@@ -79,7 +85,9 @@ public class NoteController {
     public ResponseEntity<ResponseObject> updateNote(@RequestBody Note note, Authentication authentication) {
         Note currentNote = noteService.getNoteById(note.getId());
         String authorName = authentication.getName();
-        if (currentNote != null && currentNote.getAuthor().getUsername().equalsIgnoreCase(authorName)) { //Check workspace muốn chuyển tới có phải của user ko
+        if (currentNote != null
+                && userUtil.isUserActive(authentication)
+                && currentNote.getAuthor().getUsername().equalsIgnoreCase(authorName)) { //Check workspace muốn chuyển tới có phải của user ko
 
             WorkSpace workSpace = workspaceService.getWorkspaceById(note.getWorkspace().getId());
 
@@ -104,7 +112,9 @@ public class NoteController {
     @DeleteMapping("/remove/{id}")
     public ResponseEntity<ResponseObject> deleteNote(@PathVariable Long id, Authentication authentication) {
         Note currentNote = noteService.getNoteById(id);
-        if (currentNote != null && currentNote.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
+        if (currentNote != null
+                && userUtil.isUserActive(authentication)
+                && currentNote.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
             if (currentNote.getTasks().isEmpty()) {
                 noteService.removeNoteById(id);
 
@@ -127,8 +137,9 @@ public class NoteController {
     public ResponseEntity<ResponseObject> getTaskById(@PathVariable Long id,
                                                       Authentication authentication) {
         Task task = noteService.findTaskById(id);
-        if (task != null &&
-                task.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
+        if (task != null
+                && userUtil.isUserActive(authentication)
+                && task.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
 
             logger.info("User "+authentication.getName()+" get a task: "+id);
             return ResponseEntity.status(HttpStatus.OK).body(
@@ -147,16 +158,20 @@ public class NoteController {
                                           @RequestParam(defaultValue = "0") int page,
                                           @RequestParam(defaultValue = "10") int size,
                                           @RequestParam(defaultValue = AppConstants.LAST_EDITED_DESC_VALUE) String sort) {
-
-        logger.info("User "+authentication.getName()+" get tasks from note: "+id);
-        return noteService.getAllTaskByNoteId(id, page, size, sort);
+        if (userUtil.isUserActive(authentication)){
+            logger.info("User "+authentication.getName()+" get tasks from note: "+id);
+            return noteService.getAllTaskByNoteId(id, page, size, sort);
+        }
+        return null;
     }
 
     @PostMapping("/task/add")
     public ResponseEntity<ResponseObject> addTask(@RequestBody Task task,
                                                   Authentication authentication) {
         try {
-            if (task != null && noteService.getNoteById(task.getNote().getId()) != null) {
+            if (task != null
+                    && userUtil.isUserActive(authentication)
+                    && noteService.getNoteById(task.getNote().getId()) != null) {
                 Note note = noteService.getNoteById(task.getNote().getId());
                 if (note != null && note.getAuthor().getUsername().equals(authentication.getName())) {
                     task.setAuthor(userService.getUserForAuthor(authentication.getName()));
@@ -181,7 +196,9 @@ public class NoteController {
                                                      Authentication authentication) {
         Task currentTask = noteService.findTaskById(task.getId());
         String authorName = authentication.getName();
-        if (currentTask != null && authorName.equals(currentTask.getAuthor().getUsername())) {
+        if (currentTask != null
+                && userUtil.isUserActive(authentication)
+                && authorName.equals(currentTask.getAuthor().getUsername())) {
             logger.info("User "+authentication.getName()+" updated a task:"+task.getId());
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.TASK + " " + AppConstants.UPDATED, noteService.updateTask(task))
@@ -198,7 +215,9 @@ public class NoteController {
                                                      Authentication authentication) {
         Task currentTask = noteService.findTaskById(id);
 
-        if (currentTask != null && currentTask.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
+        if (currentTask != null
+                && userUtil.isUserActive(authentication)
+                && currentTask.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
             noteService.removeTaskById(id);
 
             logger.info("User "+authentication.getName()+" removed a task:"+id);
@@ -260,34 +279,39 @@ public class NoteController {
     public ResponseEntity<ResponseObject> uploadImage(@RequestParam("f_image") MultipartFile file, @PathVariable String id, Authentication authentication) {
         try {
             // Kiểm tra kích thước tệp ảnh
-            long fileSize = file.getSize();
-            if (fileSize > AppConstants.MAX_FILE_SIZE) {
-                logger.warn("User "+authentication.getName()+" uploaded a large file: "+fileSize);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
+            if(userUtil.isUserActive(authentication)) {
+                long fileSize = file.getSize();
+                if (fileSize > AppConstants.MAX_FILE_SIZE) {
+                    logger.warn("User " + authentication.getName() + " uploaded a large file: " + fileSize);
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                            new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
+                    );
+                }
+
+                // Kiểm tra xem tệp có phải là ảnh không
+                if (!fileService.isImage(file)) {
+                    logger.warn("User " + authentication.getName() + " uploaded not an image file");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                            new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
+                    );
+                }
+
+
+                Note note = noteService.getNoteById(Long.parseLong(id));
+                String imageURL = fileService.storeNoteImage(file);
+                note.setFeatured_image(imageURL);
+                // Trả về tên tệp ảnh
+                noteService.updateNote(note);
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE + " " + AppConstants.UPDATED, imageURL)
                 );
             }
-
-            // Kiểm tra xem tệp có phải là ảnh không
-            if (!fileService.isImage(file)) {
-                logger.warn("User "+authentication.getName()+" uploaded not an image file");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
-                );
-            }
-
-
-            Note note = noteService.getNoteById(Long.parseLong(id));
-            String imageURL = fileService.storeNoteImage(file);
-            note.setFeatured_image(imageURL);
-            // Trả về tên tệp ảnh
-            noteService.updateNote(note);
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE + " " + AppConstants.UPDATED, imageURL)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
             );
             // Trả về tên tệp ảnh
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Upload failed",e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
             );
@@ -299,7 +323,10 @@ public class NoteController {
                                   @RequestParam(defaultValue = "12") int size,
                                   @RequestParam(defaultValue = "0") int page,
                                   Authentication authentication) {
-        logger.warn("User "+authentication.getName()+" searched "+name);
-        return noteService.findNoteByName(name, authentication.getName(), size, page);
+        if(userUtil.isUserActive(authentication)) {
+            logger.warn("User " + authentication.getName() + " searched " + name);
+            return noteService.findNoteByName(name, authentication.getName(), size, page);
+        }
+        return null;
     }
 }

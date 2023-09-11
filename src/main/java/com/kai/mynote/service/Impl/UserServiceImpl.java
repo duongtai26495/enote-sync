@@ -75,6 +75,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setEmail(userRegisterDTO.getEmail());
         user.setPassword(new BCryptPasswordEncoder().encode(userRegisterDTO.getPassword()));
         user.setJoined_at(dateFormat.format(date));
+        user.setEnabled(true);
         user.setUpdated_at(dateFormat.format(date));
         user.setGender(userRegisterDTO.getGender());
 
@@ -104,7 +105,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if(profileImage != null && !profileImage.equals(existingUser.getProfile_image())){
             existingUser.setProfile_image(profileImage);
         }
-
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         existingUser.setUpdated_at(dateFormat.format(date));
@@ -209,7 +209,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void setActiveUser(String email, boolean activate) {
         User user = userRepository.findFirstByEmail(email);
-        user.setEnabled(activate);
+        user.setActive(activate);
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         user.setUpdated_at(dateFormat.format(date));

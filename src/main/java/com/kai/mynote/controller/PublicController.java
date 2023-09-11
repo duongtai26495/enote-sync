@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -74,16 +75,17 @@ public class PublicController {
 
 
     @PostMapping("/sign-in")
-    public ResponseEntity<ResponseObject> signIn(@RequestBody UserRegisterDTO userRegisterDTO) throws IOException {
+    public ResponseEntity<ResponseObject> signIn(@RequestBody User user) throws IOException {
         try {
-            authenticateUser(userRegisterDTO.getUsername(), userRegisterDTO.getPassword());
+            authenticateUser(user.getUsername(), user.getPassword());
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.LOGIN_FAIL_WARN, null));
         }
 
-        final UserDetails userDetails = userService.loadUserByUsername(userRegisterDTO.getUsername());
+        final UserDetails userDetails = userService.loadUserByUsername(user.getUsername());
 
         String loggedInUsername = userDetails.getUsername();
+
         logger.info("User logged in: "+loggedInUsername);
         return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.LOGIN_SUCCESS_WARN, jwtUtil.generateToken(loggedInUsername)));
     }
@@ -93,8 +95,11 @@ public class PublicController {
     }
 
     @GetMapping("/image/{imageName}")
-    public ResponseEntity<byte[]> displayImage(@PathVariable String imageName) {
-        return fileService.getImage(imageName);
+    public ResponseEntity<byte[]> displayImage(@PathVariable String imageName, Authentication authentication) {
+        if(userService.getUserByUsername(authentication.getName()).isActive()){
+            return fileService.getImage(imageName);
+        }
+        return null;
     }
 
     @GetMapping("/check-username/{username}")
@@ -109,8 +114,10 @@ public class PublicController {
     @GetMapping("/recovery/{email}")
     public ResponseEntity<ResponseObject> recovery(@PathVariable String email) {
             User user = userService.getUserByEmail(email);
-            if (user != null && user.isEnabled() &&
-                    user.getSendRecoveryPwCount() < 3) {
+            if (user != null
+                    && user.isEnabled()
+                    && user.isActive()
+                    && user.getSendRecoveryPwCount() < 3) {
                 userService.sendRecoveryPwMail(userService.getUserByEmail(email));
                 return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
             }
@@ -176,8 +183,11 @@ public class PublicController {
         User user = userService.getUserByEmail(activateCode.getEmail());
         ActivateCode code = codeService.findCodeByCode(activateCode.getCode());
         if (user != null){
-            if(!code.isUsed() && code.getType().equals(CodeTye.ACTIVE)
-            && user.getEmail().equalsIgnoreCase(activateCode.getEmail())){
+
+            if(!user.isActive()
+                    && !code.isUsed()
+                    && code.getType().equals(CodeTye.ACTIVE)
+                    && user.getEmail().equalsIgnoreCase(activateCode.getEmail())){
                 Date currentDate = new Date();
                 Calendar currentTime = Calendar.getInstance();
                 currentTime.setTime(currentDate);
@@ -199,7 +209,9 @@ public class PublicController {
         User currentUser = userService.getUserByEmail(user.getEmail());
         ActivateCode recoveryCode = codeService.findCodeByCode(code);
         if (currentUser != null){
-            if(!recoveryCode.isUsed() && recoveryCode.getType().equals(CodeTye.RECOVERY)
+            if(currentUser.isActive()
+                    && !recoveryCode.isUsed()
+                    && recoveryCode.getType().equals(CodeTye.RECOVERY)
                     && user.getEmail().equalsIgnoreCase(recoveryCode.getEmail())){
                 Date currentDate = new Date();
                 Calendar currentTime = Calendar.getInstance();
