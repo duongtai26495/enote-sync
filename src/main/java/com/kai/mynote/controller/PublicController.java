@@ -1,10 +1,10 @@
 package com.kai.mynote.controller;
 
 import com.kai.mynote.dto.*;
-import com.kai.mynote.entities.ActiveCode;
+import com.kai.mynote.entities.ActivateCode;
 import com.kai.mynote.entities.CodeTye;
 import com.kai.mynote.entities.User;
-import com.kai.mynote.service.Impl.ActiveCodeServiceImpl;
+import com.kai.mynote.service.Impl.ActivateCodeServiceImpl;
 import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.service.Impl.FileServiceImpl;
 import com.kai.mynote.service.Impl.UserServiceImpl;
@@ -25,11 +25,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
-import static com.kai.mynote.util.AppConstants.TIME_PATTERN;
 
 @RestController
 @RequestMapping("/public")
@@ -49,7 +46,7 @@ public class PublicController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private ActiveCodeServiceImpl codeService;
+    private ActivateCodeServiceImpl codeService;
 
     private static final Logger logger = LogManager.getLogger(PublicController.class);
 
@@ -117,21 +114,21 @@ public class PublicController {
                 userService.sendRecoveryPwMail(userService.getUserByEmail(email));
                 return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
             }
-            if (user != null && user.getSendActiveMailCount() >= 3) {
+            if (user != null && user.getSendActivateMailCount() >= 3) {
                 Date currentDate = new Date();
                 Calendar currentTime = Calendar.getInstance();
                 currentTime.setTime(currentDate);
 
                 Date current = currentTime.getTime();
 
-                Date lastTime = user.getLastSendActiveEmail();
+                Date lastTime = user.getLastSendActivateEmail();
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(lastTime);
                 calendar.add(Calendar.HOUR, 24);
                 Date lastSent = calendar.getTime();
 
                 if (lastSent.compareTo(current) < 0) {
-                    user.setSendActiveMailCount(0);
+                    user.setSendActivateMailCount(0);
                     userService.updateUser(user);
                     userService.sendRecoveryPwMail(userService.getUserByEmail(email));
                     logger.info("Recovery email: " + email);
@@ -141,29 +138,29 @@ public class PublicController {
             return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.EMAIL_NOT_EXIST, null));
     }
 
-    @GetMapping("/resend-active-mail")
+    @GetMapping("/send-activate-mail")
     public ResponseEntity<ResponseObject> resendActiveMail(@PathParam("email") String email){
         User user = userService.getUserByEmail(email);
         if(user != null && !user.isEnabled() &&
-                user.getSendActiveMailCount() < 3) {
+                user.getSendActivateMailCount() < 3) {
             userService.sendActiveMail(userService.getUserByEmail(email));
             return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
         }
-        if(user != null && user.getSendActiveMailCount() >= 3 ) {
+        if(user != null && user.getSendActivateMailCount() >= 3 ) {
             Date currentDate = new Date();
             Calendar currentTime = Calendar.getInstance();
             currentTime.setTime(currentDate);
 
             Date current = currentTime.getTime();
 
-            Date lastTime = user.getLastSendActiveEmail();
+            Date lastTime = user.getLastSendActivateEmail();
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(lastTime);
             calendar.add(Calendar.HOUR,24);
             Date lastSent = calendar.getTime();
 
             if (lastSent.compareTo(current) < 0) {
-                user.setSendActiveMailCount(0);
+                user.setSendActivateMailCount(0);
                 userService.updateUser(user);
                 userService.sendActiveMail(userService.getUserByEmail(email));
                 logger.info("Resend active email: " + email);
@@ -175,12 +172,12 @@ public class PublicController {
     }
 
     @PostMapping("/activate-account")
-    public ResponseEntity<ResponseObject> activateAccount(@RequestBody ActiveCode activeCode) throws ParseException {
-        User user = userService.getUserByEmail(activeCode.getEmail());
-        ActiveCode code = codeService.findCodeByCode(activeCode.getCode());
+    public ResponseEntity<ResponseObject> activateAccount(@RequestBody ActivateCode activateCode) throws ParseException {
+        User user = userService.getUserByEmail(activateCode.getEmail());
+        ActivateCode code = codeService.findCodeByCode(activateCode.getCode());
         if (user != null){
             if(!code.isUsed() && code.getType().equals(CodeTye.ACTIVE)
-            && user.getEmail().equalsIgnoreCase(activeCode.getEmail())){
+            && user.getEmail().equalsIgnoreCase(activateCode.getEmail())){
                 Date currentDate = new Date();
                 Calendar currentTime = Calendar.getInstance();
                 currentTime.setTime(currentDate);
@@ -200,7 +197,7 @@ public class PublicController {
     @PostMapping("/recovery-password/{code}")
     public ResponseEntity<ResponseObject> recoveryPassword(@PathVariable String code, @RequestBody User user) throws ParseException {
         User currentUser = userService.getUserByEmail(user.getEmail());
-        ActiveCode recoveryCode = codeService.findCodeByCode(code);
+        ActivateCode recoveryCode = codeService.findCodeByCode(code);
         if (currentUser != null){
             if(!recoveryCode.isUsed() && recoveryCode.getType().equals(CodeTye.RECOVERY)
                     && user.getEmail().equalsIgnoreCase(recoveryCode.getEmail())){

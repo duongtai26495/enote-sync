@@ -3,9 +3,7 @@ package com.kai.mynote.service.Impl;
 import com.kai.mynote.service.MailService;
 import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.config.MyUserDetails;
-import com.kai.mynote.dto.UserDTO;
 import com.kai.mynote.dto.UserRegisterDTO;
-import com.kai.mynote.dto.UserUpdateDTO;
 import com.kai.mynote.entities.*;
 import com.kai.mynote.repository.*;
 import com.kai.mynote.service.UserService;
@@ -232,20 +230,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         expiredTime.add(Calendar.MINUTE, 5);
         Date expired = expiredTime.getTime();
 
-        ActiveCode activeCode = new ActiveCode();
-        activeCode.setUsername(user.getUsername());
-        activeCode.setEmail(user.getEmail());
-        activeCode.setCreatedAt(current);
-        activeCode.setExpiredAt(expired);
-        activeCode.setType(CodeTye.ACTIVE);
+        ActivateCode activateCode = new ActivateCode();
+        activateCode.setUsername(user.getUsername());
+        activateCode.setEmail(user.getEmail());
+        activateCode.setCreatedAt(current);
+        activateCode.setExpiredAt(expired);
+        activateCode.setType(CodeTye.ACTIVE);
 
-        user.setSendActiveMailCount(user.getSendActiveMailCount()+1);
-        user.setLastSendActiveEmail(current);
+        user.setSendActivateMailCount(user.getSendActivateMailCount()+1);
+        user.setLastSendActivateEmail(current);
         updateUser(user);
 
-        activeCode.setCode(userUtil.generateRandomString().toLowerCase());
-        codeRepository.save(activeCode);
-        String content_active_mail = String.format(AppConstants.ACTIVE_EMAIL_CONTENT,activeCode.getCode());
+        activateCode.setCode(userUtil.generateRandomString().toLowerCase());
+        codeRepository.save(activateCode);
+        String content_active_mail = String.format(AppConstants.ACTIVE_EMAIL_CONTENT, activateCode.getCode());
         try {
             mailService.sendHtmlEmail(user.getEmail(),AppConstants.SUBJECT_ACTIVE_CONTENT,content_active_mail);
             logger.info("Mail active sent to: "+user.getEmail());
@@ -266,20 +264,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         expiredTime.add(Calendar.MINUTE, 15);
         Date expired = expiredTime.getTime();
 
-        ActiveCode activeCode = new ActiveCode();
-        activeCode.setUsername(user.getUsername());
-        activeCode.setEmail(user.getEmail());
-        activeCode.setCreatedAt(current);
-        activeCode.setExpiredAt(expired);
-        activeCode.setType(CodeTye.RECOVERY);
+        ActivateCode activateCode = new ActivateCode();
+        activateCode.setUsername(user.getUsername());
+        activateCode.setEmail(user.getEmail());
+        activateCode.setCreatedAt(current);
+        activateCode.setExpiredAt(expired);
+        activateCode.setType(CodeTye.RECOVERY);
 
         user.setSendRecoveryPwCount(user.getSendRecoveryPwCount()+1);
         user.setLastSendRecoveryEmail(current);
         updateUser(user);
 
-        activeCode.setCode(userUtil.generateRandomString().toLowerCase());
-        codeRepository.save(activeCode);
-        String content_recovery_mail = String.format(AppConstants.RECOVERY_PASSWORD_EMAIL_CONTENT,activeCode.getCode());
+        activateCode.setCode(userUtil.generateRandomString().toLowerCase());
+        codeRepository.save(activateCode);
+        String content_recovery_mail = String.format(AppConstants.RECOVERY_PASSWORD_EMAIL_CONTENT, activateCode.getCode());
         try {
             mailService.sendHtmlEmail(user.getEmail(),AppConstants.SUBJECT_RECOVERY_CONTENT,content_recovery_mail);
             logger.info("Mail recovery sent to: "+user.getEmail());

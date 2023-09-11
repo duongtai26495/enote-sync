@@ -2,15 +2,14 @@ package com.kai.mynote.entities;
 
 import com.kai.mynote.util.AppConstants;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "active_codes")
-public class ActiveCode {
+@Table(name = "activate_codes")
+public class ActivateCode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

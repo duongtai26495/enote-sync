@@ -32,13 +32,12 @@ public class User {
 
     private Gender gender = Gender.UNKNOWN;
 
-    private int sendActiveMailCount = 0;
+    private int sendActivateMailCount = 0;
+    private Date lastSendActivateEmail;
 
     private int sendRecoveryPwCount = 0;
-
     private Date lastSendRecoveryEmail;
 
-    private Date lastSendActiveEmail;
 
     @Enumerated(EnumType.STRING)
     private Provider provider = Provider.LOCAL;
