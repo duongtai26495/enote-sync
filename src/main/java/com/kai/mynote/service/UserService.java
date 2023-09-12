@@ -36,9 +36,9 @@ public interface UserService {
 
     HashMap<String, String> userAnalytics(String username);
 
-    void setActiveUser(String username, boolean activate);
+    void setActivateUser(String username, boolean activate);
 
-    void sendActiveMail(User user);
+    void sendActivateMail(User user);
 
     void sendRecoveryPwMail(User user);
 }

@@ -207,9 +207,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void setActiveUser(String email, boolean activate) {
+    public void setActivateUser(String email, boolean activate) {
         User user = userRepository.findFirstByEmail(email);
-        user.setActive(activate);
+        user.setActivate(activate);
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         user.setUpdated_at(dateFormat.format(date));
@@ -218,7 +218,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void sendActiveMail(User user) {
+    public void sendActivateMail(User user) {
 
         Date currentDate = new Date();
         Calendar currentTime = Calendar.getInstance();

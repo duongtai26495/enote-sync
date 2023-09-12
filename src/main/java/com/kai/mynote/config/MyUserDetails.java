@@ -55,5 +55,5 @@ public class MyUserDetails implements UserDetails {
         return user.isEnabled();
     }
 
-    public boolean isActive() { return user.isActive(); }
+    public boolean isActive() { return user.isActivate(); }
 }

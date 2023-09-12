@@ -29,7 +29,7 @@ public class UserUtil {
             return randomString.toString();
         }
     public boolean isUserActive(Authentication authentication){
-        return userRepository.findFirstByUsername(authentication.getName()).isActive();
+        return userRepository.findFirstByUsername(authentication.getName()).isActivate();
     }
 
 }

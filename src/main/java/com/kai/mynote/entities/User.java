@@ -53,7 +53,7 @@ public class User {
     @JsonIgnore
     private List<Note> notes;
 
-    private boolean active = false;
+    private boolean activate = false;
 
     @OneToMany(mappedBy = "author")
     @JsonIgnore
