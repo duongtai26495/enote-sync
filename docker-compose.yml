@@ -15,15 +15,11 @@ services:
         - mysql-data:/var/lib/mysql
         - ./new.sql:/docker-entrypoint-initdb.d/init.sql
     web:
-      image: duongtai264/ememo_kai:0.0.3
+      image: duongtai264/ememo_kai:0.0.4
       ports:
         - "8080:8080"
       environment:
-<<<<<<< HEAD
         SPRING_DATASOURCE_URL: jdbc:mysql://192.168.1.18:3336/ememo_test?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=yes&characterEncoding=UTF-8&character_set_server=utf8mb4
-=======
-        SPRING_DATASOURCE_URL: jdbc:mysql://192.168.1.19:3336/ememo_test?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=yes&characterEncoding=UTF-8&character_set_server=utf8mb4
->>>>>>> 5fa9e32d86a51ebccdc5415651fd1f4e8148f6e5
       depends_on:
         - mysql
 
