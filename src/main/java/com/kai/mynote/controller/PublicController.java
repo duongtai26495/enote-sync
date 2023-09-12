@@ -96,7 +96,7 @@ public class PublicController {
 
     @GetMapping("/image/{imageName}")
     public ResponseEntity<byte[]> displayImage(@PathVariable String imageName, Authentication authentication) {
-        if(userService.getUserByUsername(authentication.getName()).isActive()){
+        if(userService.getUserByUsername(authentication.getName()).isActivate()){
             return fileService.getImage(imageName);
         }
         return null;
@@ -116,7 +116,7 @@ public class PublicController {
             User user = userService.getUserByEmail(email);
             if (user != null
                     && user.isEnabled()
-                    && user.isActive()
+                    && user.isActivate()
                     && user.getSendRecoveryPwCount() < 3) {
                 userService.sendRecoveryPwMail(userService.getUserByEmail(email));
                 return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
@@ -148,9 +148,11 @@ public class PublicController {
     @GetMapping("/send-activate-mail")
     public ResponseEntity<ResponseObject> resendActiveMail(@PathParam("email") String email){
         User user = userService.getUserByEmail(email);
-        if(user != null && !user.isEnabled() &&
-                user.getSendActivateMailCount() < 3) {
-            userService.sendActiveMail(userService.getUserByEmail(email));
+        if(user != null
+                && !user.isActivate()
+                && user.isEnabled()
+                && user.getSendActivateMailCount() < 3) {
+            userService.sendActivateMail(userService.getUserByEmail(email));
             return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
         }
         if(user != null && user.getSendActivateMailCount() >= 3 ) {
@@ -169,7 +171,7 @@ public class PublicController {
             if (lastSent.compareTo(current) < 0) {
                 user.setSendActivateMailCount(0);
                 userService.updateUser(user);
-                userService.sendActiveMail(userService.getUserByEmail(email));
+                userService.sendActivateMail(userService.getUserByEmail(email));
                 logger.info("Resend active email: " + email);
                 return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
             }
@@ -184,7 +186,8 @@ public class PublicController {
         ActivateCode code = codeService.findCodeByCode(activateCode.getCode());
         if (user != null){
 
-            if(!user.isActive()
+            if(!user.isActivate()
+                    && user.isEnabled()
                     && !code.isUsed()
                     && code.getType().equals(CodeTye.ACTIVE)
                     && user.getEmail().equalsIgnoreCase(activateCode.getEmail())){
@@ -194,7 +197,7 @@ public class PublicController {
                 Date current = currentTime.getTime();
 
                 if(current.compareTo(code.getExpiredAt()) < 0 ){
-                    userService.setActiveUser(code.getEmail(), true);
+                    userService.setActivateUser(code.getEmail(), true);
                     codeService.updateCode(code);
                     return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.USER + " " + AppConstants.ACTIVATED,null));
                 }
@@ -209,7 +212,8 @@ public class PublicController {
         User currentUser = userService.getUserByEmail(user.getEmail());
         ActivateCode recoveryCode = codeService.findCodeByCode(code);
         if (currentUser != null){
-            if(currentUser.isActive()
+            if(currentUser.isActivate()
+                    && currentUser.isEnabled()
                     && !recoveryCode.isUsed()
                     && recoveryCode.getType().equals(CodeTye.RECOVERY)
                     && user.getEmail().equalsIgnoreCase(recoveryCode.getEmail())){
