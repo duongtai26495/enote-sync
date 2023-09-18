@@ -26,8 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 @RestController
 @RequestMapping("/public")
@@ -79,7 +78,7 @@ public class PublicController {
         try {
             authenticateUser(user.getUsername(), user.getPassword());
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.LOGIN_FAIL_WARN, null));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.USERNAME_PASSWORD_WRONG, null));
         }
 
         final UserDetails userDetails = userService.loadUserByUsername(user.getUsername());
@@ -196,6 +195,7 @@ public class PublicController {
                 currentTime.setTime(currentDate);
                 Date current = currentTime.getTime();
 
+                logger.info("User activate account: "+activateCode.getEmail());
                 if(current.compareTo(code.getExpiredAt()) < 0 ){
                     userService.setActivateUser(code.getEmail(), true);
                     codeService.updateCode(code);
@@ -221,7 +221,7 @@ public class PublicController {
                 Calendar currentTime = Calendar.getInstance();
                 currentTime.setTime(currentDate);
                 Date current = currentTime.getTime();
-
+                logger.info("User: "+user.getEmail() +" change password with code: "+code);
                 if(current.compareTo(recoveryCode.getExpiredAt()) < 0 ){
                     codeService.updateCode(recoveryCode);
                     userService.updatePassword(user);
@@ -232,5 +232,60 @@ public class PublicController {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.USER_FOUND, null));
     }
+    @GetMapping("/sort_value")
+    public List<Map<String, String>> getSortValue() {
+        List<Map<String, String>> sortValue = new ArrayList<>();
 
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.LAST_EDITED_DESC_LABEL, AppConstants.LAST_EDITED_DESC_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.LAST_EDITED_ASC_LABEL, AppConstants.LAST_EDITED_ASC_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.CREATED_AT_DESC_LABEL, AppConstants.CREATED_AT_DESC_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.CREATED_AT_ASC_LABEL, AppConstants.CREATED_AT_ASC_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.A_Z_LABEL, AppConstants.A_Z_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.Z_A_LABEL, AppConstants.Z_A_VALUE);
+        }});
+
+        logger.info("Anonymous get notes shorts");
+        return sortValue;
+    }
+
+    @GetMapping("/task/sort_value")
+    public List<Map<String, String>> getTaskSortValue() {
+        List<Map<String, String>> sortValue = new ArrayList<>();
+
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.LAST_EDITED_DESC_LABEL, AppConstants.LAST_EDITED_DESC_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.CREATED_AT_DESC_LABEL, AppConstants.CREATED_AT_DESC_VALUE);
+        }});
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.CREATED_AT_ASC_LABEL, AppConstants.CREATED_AT_ASC_VALUE);
+        }});
+
+        logger.info("Anonymous get tasks shorts");
+        return sortValue;
+    }
+
+    @GetMapping("/check-code/{code}")
+    public boolean checkTheCode(@PathVariable String code) {
+        ActivateCode currentCode = codeService.findCodeByCode(code);
+        Date currentDate = new Date();
+        Calendar currentTime = Calendar.getInstance();
+        currentTime.setTime(currentDate);
+        Date current = currentTime.getTime();
+        logger.info("Check the code: "+code);
+        return !currentCode.isUsed()
+                && current.compareTo(currentCode.getExpiredAt()) < 0;
+    }
 }
