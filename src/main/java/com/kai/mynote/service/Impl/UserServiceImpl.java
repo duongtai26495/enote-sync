@@ -235,7 +235,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         activateCode.setEmail(user.getEmail());
         activateCode.setCreatedAt(current);
         activateCode.setExpiredAt(expired);
-        activateCode.setType(CodeTye.ACTIVE);
+        activateCode.setType(CodeTye.ACTIVATE);
 
         user.setSendActivateMailCount(user.getSendActivateMailCount()+1);
         user.setLastSendActivateEmail(current);

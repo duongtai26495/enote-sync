@@ -188,7 +188,7 @@ public class PublicController {
             if(!user.isActivate()
                     && user.isEnabled()
                     && !code.isUsed()
-                    && code.getType().equals(CodeTye.ACTIVE)
+                    && code.getType().equals(CodeTye.ACTIVATE)
                     && user.getEmail().equalsIgnoreCase(activateCode.getEmail())){
                 Date currentDate = new Date();
                 Calendar currentTime = Calendar.getInstance();
