@@ -23,7 +23,7 @@ public class UserDTO {
 
     private Gender gender;
 
-    private boolean enabled;
+    private boolean activate;
 
     private String updated_at;
 

@@ -22,6 +22,5 @@ services:
         SPRING_DATASOURCE_URL: jdbc:mysql://192.168.1.19:3336/ememo_test?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=yes&characterEncoding=UTF-8&character_set_server=utf8mb4
       depends_on:
         - mysql
-
 volumes:
   mysql-data:

@@ -78,6 +78,6 @@ public class User {
     private boolean enabled = false;
 
     public UserDTO convertDTO(User user){
-        return new UserDTO(user.getId(), user.getF_name(), user.getL_name(), user.getEmail(), user.getUsername(),  user.getGender(), user.isEnabled(), user.getUpdated_at(), user.getJoined_at(), user.getProfile_image());
+        return new UserDTO(user.getId(), user.getF_name(), user.getL_name(), user.getEmail(), user.getUsername(),  user.getGender(), user.isActivate(), user.getUpdated_at(), user.getJoined_at(), user.getProfile_image());
     }
 }

@@ -230,50 +230,7 @@ public class NoteController {
         );
     }
 
-    @GetMapping("/sort_value")
-    public List<Map<String, String>> getSortValue(Authentication authentication) {
-        List<Map<String, String>> sortValue = new ArrayList<>();
 
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.LAST_EDITED_DESC_LABEL, AppConstants.LAST_EDITED_DESC_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.LAST_EDITED_ASC_LABEL, AppConstants.LAST_EDITED_ASC_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.CREATED_AT_DESC_LABEL, AppConstants.CREATED_AT_DESC_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.CREATED_AT_ASC_LABEL, AppConstants.CREATED_AT_ASC_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.A_Z_LABEL, AppConstants.A_Z_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.Z_A_LABEL, AppConstants.Z_A_VALUE);
-        }});
-
-        logger.info("User "+authentication.getName()+" get note sorts");
-        return sortValue;
-    }
-
-    @GetMapping("/task/sort_value")
-    public List<Map<String, String>> getTaskSortValue(Authentication authentication) {
-        List<Map<String, String>> sortValue = new ArrayList<>();
-
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.LAST_EDITED_DESC_LABEL, AppConstants.LAST_EDITED_DESC_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.CREATED_AT_DESC_LABEL, AppConstants.CREATED_AT_DESC_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.CREATED_AT_ASC_LABEL, AppConstants.CREATED_AT_ASC_VALUE);
-        }});
-
-        logger.info("User "+authentication.getName()+" get tasks shorts");
-        return sortValue;
-    }
 
     @PostMapping("/upload/{id}")
     public ResponseEntity<ResponseObject> uploadImage(@RequestParam("f_image") MultipartFile file, @PathVariable String id, Authentication authentication) {
