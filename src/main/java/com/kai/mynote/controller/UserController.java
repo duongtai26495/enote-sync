@@ -45,8 +45,7 @@ public class UserController {
 
     @GetMapping("info/{username}")
     public ResponseEntity<ResponseObject> getInfoUser(@PathVariable String username, Authentication authentication){
-        if ( userUtil.isUserActive(authentication)
-                && authentication.getName().equalsIgnoreCase(username)){
+        if (authentication.getName().equalsIgnoreCase(username)){
             logger.info("Get infor user: "+username);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(AppConstants.SUCCESS_STATUS,"User information",
@@ -106,7 +105,6 @@ public class UserController {
                                                               @RequestParam("user_profile_image") MultipartFile file){
         if(userUtil.isUserActive(authentication) && authentication.getName().equalsIgnoreCase(username)) {
             try {
-                // Kiểm tra kích thước tệp ảnh
                 long fileSize = file.getSize();
                 if (fileSize > AppConstants.MAX_FILE_SIZE) {
                     logger.warn("User "+username+" uploaded large image: "+file.getSize());
@@ -115,7 +113,6 @@ public class UserController {
                     );
                 }
 
-                // Kiểm tra xem tệp có phải là ảnh không
                 if (!fileService.isImage(file)) {
                     logger.warn("User "+username+" uploaded not an image file");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
