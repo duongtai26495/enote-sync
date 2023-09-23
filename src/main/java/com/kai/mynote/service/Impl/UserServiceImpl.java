@@ -135,9 +135,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 
     @Override
-    public Page<WorkSpace> getAllWorkspace(String username, int pageNo, int pageSize) {
+    public Page<WorkSpace> getAllWorkspace(String username, int pageNo, int pageSize, String sort) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        return workspaceRepository.getAllWorkspace(username, pageable);
+        return switch (sort) {
+            case AppConstants.LAST_EDITED_ASC_VALUE -> workspaceRepository.getAllWorkspaceByUsernameOrderByUpdatedAtASC(username, pageable);
+            case AppConstants.CREATED_AT_DESC_VALUE -> workspaceRepository.getAllWorkspaceByUsernameOrderByCreatedAtDESC(username, pageable);
+            case AppConstants.CREATED_AT_ASC_VALUE -> workspaceRepository.getAllWorkspaceByUsernameOrderByCreatedAtASC(username, pageable);
+            case AppConstants.A_Z_VALUE -> workspaceRepository.getAllWorkspaceByUsernameOrderByNameASC(username, pageable);
+            case AppConstants.Z_A_VALUE -> workspaceRepository.getAllWorkspaceByUsernameOrderByNameDESC(username, pageable);
+            default -> workspaceRepository.getAllWorkspaceByUsernameOrderByUpdatedAtDESC(username, pageable);
+        };
     }
 
     @Override
@@ -192,7 +199,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         List<Note> notes = noteRepository.getAllNoteByUsername(username);
         long tasksCheck = tasks.stream().filter(item -> item.getType() == Type.CHECK).count();
         long isDoneTask = tasks.stream().filter(item -> item.getType() == Type.CHECK && item.isDone()).count();
-        result.put("workspaces", String.valueOf(workspaceRepository.getAllWorkspaceByUsername(username).size()));
+        result.put("workspaces", String.valueOf(workspaceRepository.getAllWorkspace(username).size()));
         result.put("notes", String.valueOf(notes.size()));
         result.put("tasks", String.valueOf(tasks.size()));
         result.put("tasksDone", String.valueOf(isDoneTask));

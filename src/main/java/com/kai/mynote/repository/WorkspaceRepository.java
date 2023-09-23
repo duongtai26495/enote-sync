@@ -17,5 +17,22 @@ public interface WorkspaceRepository extends JpaRepository<WorkSpace, Long> {
     Page<WorkSpace> getAllWorkspace(@Param("username") String username, Pageable pageable);
 
     @Query(value = "SELECT w FROM WorkSpace w WHERE w.author.username = :username")
-    List<WorkSpace> getAllWorkspaceByUsername(@Param("username") String username);
+    List<WorkSpace> getAllWorkspace(@Param("username") String username);
+    @Query(value = "SELECT w FROM WorkSpace w WHERE w.author.username = :username ORDER BY w.created_at ASC")
+    Page<WorkSpace> getAllWorkspaceByUsernameOrderByCreatedAtASC(@Param("username") String username, Pageable pageable);
+
+    @Query(value = "SELECT w FROM WorkSpace w WHERE w.author.username = :username ORDER BY w.created_at DESC")
+    Page<WorkSpace> getAllWorkspaceByUsernameOrderByCreatedAtDESC(@Param("username") String username, Pageable pageable);
+
+    @Query(value = "SELECT w FROM WorkSpace w WHERE w.author.username = :username ORDER BY w.updated_at ASC")
+    Page<WorkSpace> getAllWorkspaceByUsernameOrderByUpdatedAtASC(@Param("username") String username, Pageable pageable);
+
+    @Query(value = "SELECT w FROM WorkSpace w WHERE w.author.username = :username ORDER BY w.updated_at DESC")
+    Page<WorkSpace> getAllWorkspaceByUsernameOrderByUpdatedAtDESC(@Param("username") String username, Pageable pageable);
+
+    @Query(value = "SELECT w FROM WorkSpace w WHERE w.author.username = :username ORDER BY w.name ASC")
+    Page<WorkSpace> getAllWorkspaceByUsernameOrderByNameASC(@Param("username") String username, Pageable pageable);
+
+    @Query(value = "SELECT w FROM WorkSpace w WHERE w.author.username = :username ORDER BY w.name DESC")
+    Page<WorkSpace> getAllWorkspaceByUsernameOrderByNameDESC(@Param("username") String username, Pageable pageable);
 }

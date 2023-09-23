@@ -94,11 +94,8 @@ public class PublicController {
     }
 
     @GetMapping("/image/{imageName}")
-    public ResponseEntity<byte[]> displayImage(@PathVariable String imageName, Authentication authentication) {
-        if(userService.getUserByUsername(authentication.getName()).isActivate()){
+    public ResponseEntity<byte[]> displayImage(@PathVariable String imageName) {
             return fileService.getImage(imageName);
-        }
-        return null;
     }
 
     @GetMapping("/check-username/{username}")

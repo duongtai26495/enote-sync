@@ -33,12 +33,29 @@ public class WorkSpaceController {
     @GetMapping("/all")
     public Page<WorkSpace> getWsByUsername(Authentication authentication,
                                 @RequestParam(defaultValue = "0") int page,
-                                @RequestParam(defaultValue = "10") int size){
+                                @RequestParam(defaultValue = "10") int size,
+                                @RequestParam(defaultValue = AppConstants.LAST_EDITED_DESC_VALUE) String sort){
         if (userUtil.isUserActive(authentication)) {
-            logger.info("User " + authentication.getName() + " just get all workspaces");
-            return userService.getAllWorkspace(authentication.getName(), page, size);
+            logger.info("User " + authentication.getName() + " just get all workspaces by " + sort );
+            return userService.getAllWorkspace(authentication.getName(), page, size, sort);
         }
         return null;
+    }
+
+    @GetMapping("/info/{id}")
+    public ResponseEntity<ResponseObject> getInfoWorkspace(@PathVariable Long id, Authentication authentication){
+
+        WorkSpace workSpace = workspaceService.getWorkspaceById(id);
+        if(userUtil.isUserActive(authentication)
+                && authentication.getName().equalsIgnoreCase(workSpace.getAuthor().getUsername())){
+            logger.info("User "+authentication.getName()+" just get info workspace by id "+id);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.WORKSPACE + " " + AppConstants.CREATED, workSpace)
+            );
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ResponseObject(AppConstants.FAILURE_STATUS,"Bad request",null)
+        );
     }
 
     @GetMapping("/get/{id}")

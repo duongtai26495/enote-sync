@@ -24,7 +24,7 @@ public interface UserService {
 
     boolean isExistByUsername(String username);
 
-    Page<WorkSpace> getAllWorkspace(String username, int pageNo, int pageSize);
+    Page<WorkSpace> getAllWorkspace(String username, int pageNo, int pageSize, String sort);
 
     User getUserForAuthor(String username);
 
