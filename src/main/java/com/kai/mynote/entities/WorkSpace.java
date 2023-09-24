@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,7 +24,9 @@ public class WorkSpace {
 
     @OneToMany(mappedBy = "workspace")
     @JsonIgnore
-    private List<Note> notes;
+    private List<Note> notes = new ArrayList<>();
+
+    private int note_count;
 
     @Column(updatable = false)
     private String created_at;
@@ -33,5 +36,9 @@ public class WorkSpace {
     @JoinColumn(name = "author_id")
     @JsonIgnore
     private User author;
+
+    public int getNote_count() {
+        return this.notes.size();
+    }
 
 }

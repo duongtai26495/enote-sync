@@ -180,7 +180,7 @@ public class PublicController {
     public ResponseEntity<ResponseObject> activateAccount(@RequestBody ActivateCode activateCode) throws ParseException {
         User user = userService.getUserByEmail(activateCode.getEmail());
         ActivateCode code = codeService.findCodeByCode(activateCode.getCode());
-        if (user != null){
+        if (user != null && code != null){
 
             if(!user.isActivate()
                     && user.isEnabled()
@@ -201,7 +201,7 @@ public class PublicController {
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.CODE_EXPIRED, null));
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.ACTIVATED_FAIL, null));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.ACTIVATED_FAIL +" or " + AppConstants.CODE_EXPIRED, null));
     }
 
     @PostMapping("/recovery-password/{code}")

@@ -33,7 +33,7 @@ public final class AppConstants {
     public static final String REGISTER_SUCCESS_WARN = "User register success";
     public static final String AUTH_HEADER = "Authorization";
     public static final String BEARER_TOKEN_PREFIX = "Bearer ";
-    public static final String ACTIVATED_FAIL = "activated fail";
+    public static final String ACTIVATED_FAIL = "Activated fail";
 
 
     public static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
