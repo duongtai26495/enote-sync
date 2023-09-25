@@ -2,7 +2,7 @@ package com.kai.mynote.controller;
 
 import com.kai.mynote.dto.*;
 import com.kai.mynote.entities.ActivateCode;
-import com.kai.mynote.entities.CodeTye;
+import com.kai.mynote.enums.CodeTye;
 import com.kai.mynote.entities.User;
 import com.kai.mynote.service.Impl.ActivateCodeServiceImpl;
 import com.kai.mynote.util.AppConstants;
@@ -19,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -250,6 +249,14 @@ public class PublicController {
         }});
         sortValue.add(new HashMap<String, String>() {{
             put(AppConstants.Z_A_LABEL, AppConstants.Z_A_VALUE);
+        }});
+
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.DONE_LAST_UPDATED_ASC_LABEL, AppConstants.DONE_LAST_UPDATED_ASC_VALUE);
+        }});
+
+        sortValue.add(new HashMap<String, String>() {{
+            put(AppConstants.DONE_LAST_UPDATED_DESC_LABEL, AppConstants.DONE_LAST_UPDATED_DESC_VALUE);
         }});
 
         logger.info("Anonymous get notes shorts");

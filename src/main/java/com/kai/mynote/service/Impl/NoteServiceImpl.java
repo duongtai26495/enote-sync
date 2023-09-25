@@ -2,7 +2,7 @@ package com.kai.mynote.service.Impl;
 
 import com.kai.mynote.entities.Note;
 import com.kai.mynote.entities.Task;
-import com.kai.mynote.entities.Type;
+import com.kai.mynote.enums.Type;
 import com.kai.mynote.repository.NoteRepository;
 import com.kai.mynote.repository.TaskRepository;
 import com.kai.mynote.service.NoteService;

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,16 +35,22 @@ public class Note {
     private WorkSpace workspace;
 
     @OneToMany(mappedBy = "note")
-    private List<Task> tasks;
+    private List<Task> tasks = new ArrayList<>();
 
     @Column(updatable = false)
     private String created_at;
 
     private String updated_at;
 
+    private int task_count;
+
     @ManyToOne
     @JoinColumn(name = "author_id")
     @JsonIgnore
     private User author;
+
+    public int getTask_count() {
+        return this.tasks.size();
+    }
 
 }

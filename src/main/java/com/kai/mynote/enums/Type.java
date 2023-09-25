@@ -1,4 +1,4 @@
-package com.kai.mynote.entities;
+package com.kai.mynote.enums;
 
 public enum Type {
     NOTE,

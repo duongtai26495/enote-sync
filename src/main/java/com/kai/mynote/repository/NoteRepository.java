@@ -23,7 +23,7 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     @Query("SELECT n FROM Note n WHERE n.workspace.id = :id")
     List<Note> findByWorkspaceId(Long id);
 
-    @Query("SELECT n FROM Note n WHERE n.name LIKE %:name% AND n.author.username LIKE :username ORDER BY n.updated_at DESC")
+    @Query("SELECT n FROM Note n WHERE n.name LIKE %:name% AND n.author.username LIKE :username ORDER BY n.isDone ASC, n.updated_at DESC")
     List<Note> findNoteByName(@Param("name") String name, String username, Pageable pageable);
 
     @Query("SELECT n FROM Note n WHERE n.workspace.id = :id ORDER BY n.updated_at DESC")
@@ -38,4 +38,8 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     Page<Note> findAllByOrderByNameDesc(Long id, Pageable pageable);
     @Query("SELECT n FROM Note n WHERE n.workspace.id = :id ORDER BY n.name ASC")
     Page<Note> findAllByOrderByNameAsc(Long id, Pageable pageable);
+    @Query("SELECT n FROM Note n WHERE n.workspace.id = :id ORDER BY n.isDone ASC, n.updated_at DESC")
+    Page<Note> findAllByOrderByDoneAndUpdatedAtDESC(Long id, Pageable pageable);
+    @Query("SELECT n FROM Note n WHERE n.workspace.id = :id ORDER BY n.isDone ASC, n.updated_at ASC")
+    Page<Note> findAllByOrderByDoneAndUpdatedAtASC(Long id, Pageable pageable);
 }

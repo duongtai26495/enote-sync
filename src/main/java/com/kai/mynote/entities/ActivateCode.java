@@ -1,5 +1,6 @@
 package com.kai.mynote.entities;
 
+import com.kai.mynote.enums.CodeTye;
 import com.kai.mynote.util.AppConstants;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -8,15 +9,17 @@ import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "activate_codes")
+@Table(name = "activate_code")
 public class ActivateCode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 50)
     private String username;
 
+    @Column(length = 50)
     private String email;
 
     @Column(length = AppConstants.CODE_LENGTH)

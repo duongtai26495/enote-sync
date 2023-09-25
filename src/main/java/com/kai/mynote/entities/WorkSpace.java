@@ -16,10 +16,9 @@ public class WorkSpace {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 250)
     private String name;
 
-    @Column(length = 1000)
+    @Column(length = 1024)
     private String featured_image = "";
 
     @OneToMany(mappedBy = "workspace")
@@ -32,6 +31,7 @@ public class WorkSpace {
     private String created_at;
 
     private String updated_at;
+
     @ManyToOne
     @JoinColumn(name = "author_id")
     @JsonIgnore

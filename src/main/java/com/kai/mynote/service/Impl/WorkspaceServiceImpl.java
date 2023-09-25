@@ -76,6 +76,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             case AppConstants.CREATED_AT_ASC_VALUE -> noteRepository.findAllByOrderByCreatedAtAsc(id, pageable);
             case AppConstants.A_Z_VALUE -> noteRepository.findAllByOrderByNameAsc(id, pageable);
             case AppConstants.Z_A_VALUE -> noteRepository.findAllByOrderByNameDesc(id, pageable);
+            case AppConstants.DONE_LAST_UPDATED_ASC_VALUE -> noteRepository.findAllByOrderByDoneAndUpdatedAtASC(id, pageable);
+            case AppConstants.DONE_LAST_UPDATED_DESC_VALUE -> noteRepository.findAllByOrderByDoneAndUpdatedAtDESC(id, pageable);
             default -> noteRepository.findAllByOrderByUpdatedAtDesc(id, pageable);
         };
     }

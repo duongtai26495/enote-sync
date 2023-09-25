@@ -2,6 +2,7 @@ package com.kai.mynote.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kai.mynote.enums.Type;
 import jakarta.persistence.*;
 import lombok.Data;
 

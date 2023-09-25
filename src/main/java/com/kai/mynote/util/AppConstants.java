@@ -102,13 +102,19 @@ public final class AppConstants {
     public static final String A_Z_LABEL = "Alphabet A -> Z";
     public static final String Z_A_LABEL = "Alphabet Z -> A";
 
+    public static final String DONE_LAST_UPDATED_ASC_LABEL = "Finish by last updated, old to new";
+
+    public static final String DONE_LAST_UPDATED_DESC_LABEL = "Finish by last updated, new to old";
+
     public static final String LAST_EDITED_DESC_VALUE = "updated_at_desc";
     public static final String LAST_EDITED_ASC_VALUE = "updated_at_asc";
     public static final String CREATED_AT_DESC_VALUE = "created_at_desc";
     public static final String CREATED_AT_ASC_VALUE = "created_at_asc";
     public static final String A_Z_VALUE = "a_z";
     public static final String Z_A_VALUE = "z_a";
+    public static final String DONE_LAST_UPDATED_ASC_VALUE = "done_last_updated_asc";
 
+    public static final String DONE_LAST_UPDATED_DESC_VALUE = "done_last_updated_desc";
     public static final String SUBJECT_ACTIVE_CONTENT = "Activate your account";
     public static final String SUBJECT_RECOVERY_CONTENT = "Recovery password";
     public static final String ACTIVE_EMAIL_CONTENT = """

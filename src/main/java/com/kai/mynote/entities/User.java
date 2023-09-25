@@ -3,9 +3,10 @@ package com.kai.mynote.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kai.mynote.dto.UserDTO;
+import com.kai.mynote.enums.Gender;
+import com.kai.mynote.enums.Provider;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.lang.NonNull;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,17 +49,17 @@ public class User {
     private List<Blacklist> blacklists;
 
     @OneToMany(mappedBy = "author")
-    private List<WorkSpace> workspaces;
+    private List<WorkSpace> workspaces = new ArrayList<>();
 
     @OneToMany(mappedBy = "author")
     @JsonIgnore
-    private List<Note> notes;
+    private List<Note> notes = new ArrayList<>();
 
     private boolean activate = false;
 
     @OneToMany(mappedBy = "author")
     @JsonIgnore
-    private List<Task> tasks;
+    private List<Task> tasks = new ArrayList<>();
 
     @Column(updatable = false)
     private String joined_at;
@@ -80,5 +81,21 @@ public class User {
 
     public UserDTO convertDTO(User user){
         return new UserDTO(user.getId(), user.getF_name(), user.getL_name(), user.getEmail(), user.getUsername(),  user.getGender(), user.isActivate(), user.getUpdated_at(), user.getJoined_at(), user.getProfile_image());
+    }
+
+    private int task_count = 0;
+    private int note_count = 0;
+    private int workspace_count = 0;
+
+    public int getTask_count() {
+        return this.tasks.size();
+    }
+
+    public int getNote_count() {
+        return this.notes.size();
+    }
+
+    public int getWorkspace_count() {
+        return this.workspaces.size();
     }
 }

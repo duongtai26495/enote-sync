@@ -1,5 +1,8 @@
 package com.kai.mynote.service.Impl;
 
+import com.kai.mynote.enums.CodeTye;
+import com.kai.mynote.enums.Gender;
+import com.kai.mynote.enums.Type;
 import com.kai.mynote.service.MailService;
 import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.config.MyUserDetails;
