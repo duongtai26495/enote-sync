@@ -24,7 +24,7 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     List<Note> findByWorkspaceId(Long id);
 
     @Query("SELECT n FROM Note n WHERE n.name LIKE %:name% AND n.author.username LIKE :username ORDER BY n.isDone ASC, n.updated_at DESC")
-    List<Note> findNoteByName(@Param("name") String name, String username, Pageable pageable);
+    Page<Note> findNoteByName(@Param("name") String name, String username, Pageable pageable);
 
     @Query("SELECT n FROM Note n WHERE n.workspace.id = :id ORDER BY n.updated_at DESC")
     Page<Note> findAllByOrderByUpdatedAtDesc(Long id, Pageable pageable);

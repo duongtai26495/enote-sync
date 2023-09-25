@@ -157,7 +157,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public Page<Note> findNoteByName(String name, String username, int size, int page) {
         Pageable pageable = PageRequest.of(page, size);
-        return new PageImpl<>(noteRepository.findNoteByName(name, username, pageable));
+        return noteRepository.findNoteByName(name, username, pageable);
     }
 
     private double progressCalc(long noteId){
