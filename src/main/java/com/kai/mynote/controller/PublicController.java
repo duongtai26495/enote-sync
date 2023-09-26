@@ -102,7 +102,9 @@ public class PublicController {
         return userService.isExistByUsername(username);
     }
     @GetMapping("/check-email/{email}")
+
     public boolean checkEmailIsExist(@PathVariable String email){
+        logger.info("Anonymous check email: "+email);
         return userService.isExistByEmail(email);
     }
 
@@ -292,4 +294,5 @@ public class PublicController {
         return !currentCode.isUsed()
                 && current.compareTo(currentCode.getExpiredAt()) < 0;
     }
+
 }
