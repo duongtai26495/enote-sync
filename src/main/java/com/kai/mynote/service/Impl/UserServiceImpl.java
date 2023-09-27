@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private BlacklistRepository blacklistRepository;
 
     @Autowired
-    private ActiveCodeRepository codeRepository;
+    private UserCodeRepository codeRepository;
     
     @Autowired
     private JwtUtil jwtUtil;
@@ -240,20 +240,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         expiredTime.add(Calendar.MINUTE, 5);
         Date expired = expiredTime.getTime();
 
-        ActivateCode activateCode = new ActivateCode();
-        activateCode.setUsername(user.getUsername());
-        activateCode.setEmail(user.getEmail());
-        activateCode.setCreatedAt(current);
-        activateCode.setExpiredAt(expired);
-        activateCode.setType(CodeTye.ACTIVATE);
+        UserCode userCode = new UserCode();
+        userCode.setUsername(user.getUsername());
+        userCode.setEmail(user.getEmail());
+        userCode.setCreatedAt(current);
+        userCode.setExpiredAt(expired);
+        userCode.setType(CodeTye.ACTIVATE);
 
         user.setSendActivateMailCount(user.getSendActivateMailCount()+1);
         user.setLastSendActivateEmail(current);
         updateUser(user);
 
-        activateCode.setCode(userUtil.generateRandomString().toLowerCase());
-        codeRepository.save(activateCode);
-        String content_active_mail = String.format(AppConstants.ACTIVE_EMAIL_CONTENT, activateCode.getCode());
+        userCode.setCode(userUtil.generateRandomString().toLowerCase());
+        codeRepository.save(userCode);
+        String content_active_mail = String.format(AppConstants.ACTIVE_EMAIL_CONTENT, userCode.getCode());
         try {
             mailService.sendHtmlEmail(user.getEmail(),AppConstants.SUBJECT_ACTIVE_CONTENT,content_active_mail);
             logger.info("Mail active sent to: "+user.getEmail());
@@ -274,20 +274,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         expiredTime.add(Calendar.MINUTE, 15);
         Date expired = expiredTime.getTime();
 
-        ActivateCode activateCode = new ActivateCode();
-        activateCode.setUsername(user.getUsername());
-        activateCode.setEmail(user.getEmail());
-        activateCode.setCreatedAt(current);
-        activateCode.setExpiredAt(expired);
-        activateCode.setType(CodeTye.RECOVERY);
+        UserCode userCode = new UserCode();
+        userCode.setUsername(user.getUsername());
+        userCode.setEmail(user.getEmail());
+        userCode.setCreatedAt(current);
+        userCode.setExpiredAt(expired);
+        userCode.setType(CodeTye.RECOVERY);
 
         user.setSendRecoveryPwCount(user.getSendRecoveryPwCount()+1);
         user.setLastSendRecoveryEmail(current);
         updateUser(user);
 
-        activateCode.setCode(userUtil.generateRandomString().toLowerCase());
-        codeRepository.save(activateCode);
-        String content_recovery_mail = String.format(AppConstants.RECOVERY_PASSWORD_EMAIL_CONTENT, activateCode.getCode());
+        userCode.setCode(userUtil.generateRandomString().toLowerCase());
+        codeRepository.save(userCode);
+        String content_recovery_mail = String.format(AppConstants.RECOVERY_PASSWORD_EMAIL_CONTENT, userCode.getCode());
         try {
             mailService.sendHtmlEmail(user.getEmail(),AppConstants.SUBJECT_RECOVERY_CONTENT,content_recovery_mail);
             logger.info("Mail recovery sent to: "+user.getEmail());

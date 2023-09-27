@@ -9,8 +9,8 @@ import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "activate_code")
-public class ActivateCode {
+@Table(name = "user_code")
+public class UserCode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

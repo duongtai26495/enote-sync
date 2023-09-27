@@ -1,10 +1,10 @@
 package com.kai.mynote.controller;
 
 import com.kai.mynote.dto.*;
-import com.kai.mynote.entities.ActivateCode;
+import com.kai.mynote.entities.UserCode;
 import com.kai.mynote.enums.CodeTye;
 import com.kai.mynote.entities.User;
-import com.kai.mynote.service.Impl.ActivateCodeServiceImpl;
+import com.kai.mynote.service.Impl.UserCodeServiceImpl;
 import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.service.Impl.FileServiceImpl;
 import com.kai.mynote.service.Impl.UserServiceImpl;
@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +46,7 @@ public class PublicController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private ActivateCodeServiceImpl codeService;
+    private UserCodeServiceImpl codeService;
 
     private static final Logger logger = LogManager.getLogger(PublicController.class);
 
@@ -178,22 +179,22 @@ public class PublicController {
     }
 
     @PostMapping("/activate-account")
-    public ResponseEntity<ResponseObject> activateAccount(@RequestBody ActivateCode activateCode) throws ParseException {
-        User user = userService.getUserByEmail(activateCode.getEmail());
-        ActivateCode code = codeService.findCodeByCode(activateCode.getCode());
+    public ResponseEntity<ResponseObject> activateAccount(@RequestBody UserCode userCode) throws ParseException {
+        User user = userService.getUserByEmail(userCode.getEmail());
+        UserCode code = codeService.findCodeByCode(userCode.getCode());
         if (user != null && code != null){
 
             if(!user.isActivate()
                     && user.isEnabled()
                     && !code.isUsed()
                     && code.getType().equals(CodeTye.ACTIVATE)
-                    && user.getEmail().equalsIgnoreCase(activateCode.getEmail())){
+                    && user.getEmail().equalsIgnoreCase(userCode.getEmail())){
                 Date currentDate = new Date();
                 Calendar currentTime = Calendar.getInstance();
                 currentTime.setTime(currentDate);
                 Date current = currentTime.getTime();
 
-                logger.info("User activate account: "+activateCode.getEmail());
+                logger.info("User activate account: "+ userCode.getEmail());
                 if(current.compareTo(code.getExpiredAt()) < 0 ){
                     userService.setActivateUser(code.getEmail(), true);
                     codeService.updateCode(code);
@@ -208,7 +209,7 @@ public class PublicController {
     @PostMapping("/recovery-password/{code}")
     public ResponseEntity<ResponseObject> recoveryPassword(@PathVariable String code, @RequestBody User user) throws ParseException {
         User currentUser = userService.getUserByEmail(user.getEmail());
-        ActivateCode recoveryCode = codeService.findCodeByCode(code);
+        UserCode recoveryCode = codeService.findCodeByCode(code);
         if (currentUser != null){
             if(currentUser.isActivate()
                     && currentUser.isEnabled()
@@ -252,7 +253,6 @@ public class PublicController {
         sortValue.add(new HashMap<String, String>() {{
             put(AppConstants.Z_A_LABEL, AppConstants.Z_A_VALUE);
         }});
-
         sortValue.add(new HashMap<String, String>() {{
             put(AppConstants.DONE_LAST_UPDATED_ASC_LABEL, AppConstants.DONE_LAST_UPDATED_ASC_VALUE);
         }});
@@ -285,7 +285,7 @@ public class PublicController {
 
     @GetMapping("/check-code/{code}")
     public boolean checkTheCode(@PathVariable String code) {
-        ActivateCode currentCode = codeService.findCodeByCode(code);
+        UserCode currentCode = codeService.findCodeByCode(code);
         Date currentDate = new Date();
         Calendar currentTime = Calendar.getInstance();
         currentTime.setTime(currentDate);
@@ -295,4 +295,10 @@ public class PublicController {
                 && current.compareTo(currentCode.getExpiredAt()) < 0;
     }
 
+    @GetMapping("/check-activate-user")
+    public boolean checkActivateUser(Authentication authentication){
+        User user = userService.getUserByUsername(authentication.getName());
+        logger.info("Check activate user: " + user.getUsername());
+        return user.isActivate();
+    }
 }
