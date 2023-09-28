@@ -1,6 +1,7 @@
 package com.kai.mynote.controller;
 
 import com.kai.mynote.dto.*;
+import com.kai.mynote.entities.SortObject;
 import com.kai.mynote.entities.UserCode;
 import com.kai.mynote.enums.CodeTye;
 import com.kai.mynote.entities.User;
@@ -232,52 +233,27 @@ public class PublicController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.USER_FOUND, null));
     }
     @GetMapping("/sort_value")
-    public List<Map<String, String>> getSortValue() {
-        List<Map<String, String>> sortValue = new ArrayList<>();
-
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.LAST_EDITED_DESC_LABEL, AppConstants.LAST_EDITED_DESC_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.LAST_EDITED_ASC_LABEL, AppConstants.LAST_EDITED_ASC_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.CREATED_AT_DESC_LABEL, AppConstants.CREATED_AT_DESC_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.CREATED_AT_ASC_LABEL, AppConstants.CREATED_AT_ASC_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.A_Z_LABEL, AppConstants.A_Z_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.Z_A_LABEL, AppConstants.Z_A_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.DONE_LAST_UPDATED_ASC_LABEL, AppConstants.DONE_LAST_UPDATED_ASC_VALUE);
-        }});
-
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.DONE_LAST_UPDATED_DESC_LABEL, AppConstants.DONE_LAST_UPDATED_DESC_VALUE);
-        }});
+    public List<SortObject> getSortValue() {
+        List<SortObject> sortValue = new ArrayList<>();
+        sortValue.add(new SortObject(AppConstants.LAST_EDITED_DESC_LABEL, AppConstants.LAST_EDITED_DESC_VALUE));
+        sortValue.add(new SortObject(AppConstants.LAST_EDITED_ASC_LABEL, AppConstants.LAST_EDITED_ASC_VALUE));
+        sortValue.add(new SortObject(AppConstants.CREATED_AT_DESC_LABEL, AppConstants.CREATED_AT_DESC_VALUE));
+        sortValue.add(new SortObject(AppConstants.CREATED_AT_ASC_LABEL, AppConstants.CREATED_AT_ASC_VALUE));
+        sortValue.add(new SortObject(AppConstants.A_Z_LABEL, AppConstants.A_Z_VALUE));
+        sortValue.add(new SortObject(AppConstants.Z_A_LABEL, AppConstants.Z_A_VALUE));
+        sortValue.add(new SortObject(AppConstants.DONE_LAST_UPDATED_ASC_LABEL, AppConstants.DONE_LAST_UPDATED_ASC_VALUE));
+        sortValue.add(new SortObject(AppConstants.DONE_LAST_UPDATED_DESC_LABEL, AppConstants.DONE_LAST_UPDATED_DESC_VALUE));
 
         logger.info("Anonymous get notes shorts");
         return sortValue;
     }
 
     @GetMapping("/task/sort_value")
-    public List<Map<String, String>> getTaskSortValue() {
-        List<Map<String, String>> sortValue = new ArrayList<>();
-
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.LAST_EDITED_DESC_LABEL, AppConstants.LAST_EDITED_DESC_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.CREATED_AT_DESC_LABEL, AppConstants.CREATED_AT_DESC_VALUE);
-        }});
-        sortValue.add(new HashMap<String, String>() {{
-            put(AppConstants.CREATED_AT_ASC_LABEL, AppConstants.CREATED_AT_ASC_VALUE);
-        }});
+    public List<SortObject> getTaskSortValue() {
+        List<SortObject> sortValue = new ArrayList<>();
+        sortValue.add(new SortObject(AppConstants.LAST_EDITED_DESC_LABEL, AppConstants.LAST_EDITED_DESC_VALUE));
+        sortValue.add(new SortObject(AppConstants.CREATED_AT_DESC_LABEL, AppConstants.CREATED_AT_DESC_VALUE));
+        sortValue.add(new SortObject(AppConstants.CREATED_AT_ASC_LABEL, AppConstants.CREATED_AT_ASC_VALUE));
 
         logger.info("Anonymous get tasks shorts");
         return sortValue;
