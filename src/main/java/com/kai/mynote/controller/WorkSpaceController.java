@@ -36,6 +36,9 @@ public class WorkSpaceController {
                                 @RequestParam(defaultValue = "10") int size,
                                 @RequestParam(defaultValue = AppConstants.LAST_EDITED_DESC_VALUE) String sort){
         if (userUtil.isUserActive(authentication)) {
+            if(page < 0) {page = 0;}
+            if(size < 0) {size = 10;}
+
             logger.info("User " + authentication.getName() + " just get all workspaces by " + sort );
             return userService.getAllWorkspace(authentication.getName(), page, size, sort);
         }
@@ -66,7 +69,8 @@ public class WorkSpaceController {
         WorkSpace workSpace = workspaceService.getWorkspaceById(id);
         if (userUtil.isUserActive(authentication)
         && authentication.getName().equalsIgnoreCase(workSpace.getAuthor().getUsername())){
-
+            if(page < 0) {page = 0;}
+            if(size < 0) {size = 10;}
             logger.info("User "+authentication.getName()+" just get workspace by id "+id);
             return workspaceService.getAllNoteByWorkspaceId(id, page, size, sort);
         }

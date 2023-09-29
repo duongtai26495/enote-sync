@@ -159,6 +159,8 @@ public class NoteController {
                                           @RequestParam(defaultValue = "10") int size,
                                           @RequestParam(defaultValue = AppConstants.LAST_EDITED_DESC_VALUE) String sort) {
         if (userUtil.isUserActive(authentication)){
+            if(page < 0) {page = 0;}
+            if(size < 0) {size = 10;}
             logger.info("User "+authentication.getName()+" get tasks from note: "+id);
             return noteService.getAllTaskByNoteId(id, page, size, sort);
         }
@@ -281,6 +283,8 @@ public class NoteController {
                                   @RequestParam(defaultValue = "0") int page,
                                   Authentication authentication) {
         if(userUtil.isUserActive(authentication)) {
+            if(page < 0) {page = 0;}
+            if(size < 0) {size = 10;}
             logger.warn("User " + authentication.getName() + " searched " + name);
             return noteService.findNoteByName(name, authentication.getName(), size, page);
         }

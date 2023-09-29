@@ -115,12 +115,11 @@ public class PublicController {
             User user = userService.getUserByEmail(email);
             if (user != null
                     && user.isEnabled()
-                    && user.isActivate()
-                    && user.getSendRecoveryPwCount() < 3) {
+                    && user.getSendRecoveryPwCount() <= 5) {
                 userService.sendRecoveryPwMail(userService.getUserByEmail(email));
+                logger.info("Recovery email: " + email);
                 return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
-            }
-            if (user != null && user.getSendActivateMailCount() >= 3) {
+            }else if (user != null && user.isEnabled()) {
                 Date currentDate = new Date();
                 Calendar currentTime = Calendar.getInstance();
                 currentTime.setTime(currentDate);
@@ -140,21 +139,23 @@ public class PublicController {
                     logger.info("Recovery email: " + email);
                     return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
                 }
+                logger.info("Send recovery email limit : " + email);
+                return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.LIMIT_SEND_EMAIL, null));
             }
-            return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.EMAIL_NOT_EXIST, null));
+            return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.HAVE_ERROR, null));
     }
 
     @GetMapping("/send-activate-mail")
-    public ResponseEntity<ResponseObject> resendActiveMail(@PathParam("email") String email){
+    public ResponseEntity<ResponseObject> resendActiveMail(@PathParam("email") String email) {
         User user = userService.getUserByEmail(email);
-        if(user != null
-                && !user.isActivate()
-                && user.isEnabled()
-                && user.getSendActivateMailCount() < 3) {
-            userService.sendActivateMail(userService.getUserByEmail(email));
-            return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
+        if (user != null && user.isActivate()) {
+            return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.ACCOUNT_ACTIVATED, null));
         }
-        if(user != null && user.getSendActivateMailCount() >= 3 ) {
+        if (user != null && user.isEnabled() && user.getSendActivateMailCount() < 3) {
+            userService.sendActivateMail(userService.getUserByEmail(email));
+            logger.info("Resend active email: " + email);
+            return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
+        } else if (user != null && user.isEnabled()) {
             Date currentDate = new Date();
             Calendar currentTime = Calendar.getInstance();
             currentTime.setTime(currentDate);
@@ -164,7 +165,7 @@ public class PublicController {
             Date lastTime = user.getLastSendActivateEmail();
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(lastTime);
-            calendar.add(Calendar.HOUR,24);
+            calendar.add(Calendar.HOUR, 24);
             Date lastSent = calendar.getTime();
 
             if (lastSent.compareTo(current) < 0) {
@@ -174,9 +175,10 @@ public class PublicController {
                 logger.info("Resend active email: " + email);
                 return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
             }
-            return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.LIMIT_SEND_EMAIL,null));
+            logger.info("Send activate email limit : " + email);
+            return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.LIMIT_SEND_EMAIL, null));
         }
-        return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.ACCOUNT_ACTIVATED,null));
+        return ResponseEntity.ok(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.HAVE_ERROR, null));
     }
 
     @PostMapping("/activate-account")
@@ -211,7 +213,7 @@ public class PublicController {
     public ResponseEntity<ResponseObject> recoveryPassword(@PathVariable String code, @RequestBody User user) throws ParseException {
         User currentUser = userService.getUserByEmail(user.getEmail());
         UserCode recoveryCode = codeService.findCodeByCode(code);
-        if (currentUser != null){
+        if (currentUser != null && recoveryCode != null){
             if(currentUser.isActivate()
                     && currentUser.isEnabled()
                     && !recoveryCode.isUsed()
@@ -230,7 +232,7 @@ public class PublicController {
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.CODE_EXPIRED, null));
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.USER_FOUND, null));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.CODE_INCORRECT, null));
     }
     @GetMapping("/sort_value")
     public List<SortObject> getSortValue() {

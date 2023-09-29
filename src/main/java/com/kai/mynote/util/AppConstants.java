@@ -8,7 +8,7 @@ public final class AppConstants {
     public static final String ACCESS_TOKEN = "access_token";
     public static final String ROLE_PREFIX = "ROLE_";
     public static final String ACCOUNT_ACTIVATED = "account already activated";
-    public static final String LIMIT_SEND_EMAIL = "This account is archive limit, try again at tomorrow";
+    public static final String LIMIT_SEND_EMAIL = "This account is achieved limit, try again at tomorrow";
     public static final String ROLE_ADMIN_NAME = "ADMIN";
     public static final String ROLE_USER_NAME = "USER";
     public static final String SUCCESS_STATUS = "SUCCESS";
@@ -16,6 +16,7 @@ public final class AppConstants {
     public static final String BAD_REQUEST_MSG = "Bad request";
     public static final String EMAIL_SENT = "Email sent";
     public static final String CODE_EXPIRED = "Code is expired";
+    public static final String CODE_INCORRECT = "Code is incorrect";
     public static final String EMAIL_NOT_EXIST = "Email do not exist";
     public static final String USERNAME_PASSWORD_WRONG = "Username or Password is incorrect";
     public static final String NOTE = "note";
