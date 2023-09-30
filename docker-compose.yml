@@ -2,7 +2,7 @@ version : '3'
 
 services:
     mysql:
-      image: mysql/mysql-server:8.0
+      image: mysql/mysql-server:latest
       environment:
         - MYSQL_ROOT_PASSWORD=1199
         - MYSQL_DATABASE=space_db
@@ -15,11 +15,11 @@ services:
         - mysql-data:/var/lib/mysql
         - ./new.sql:/docker-entrypoint-initdb.d/init.sql
     web:
-      image: duongtai264/space:0.0.3
+      image: duongtai264/space:0.0.4
       ports:
         - "8080:8080"
       environment:
-        SPRING_DATASOURCE_URL: jdbc:mysql://192.168.1.20:3336/space_db?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=yes&characterEncoding=UTF-8&character_set_server=utf8mb4
+        SPRING_DATASOURCE_URL: jdbc:mysql://192.168.1.21:3336/space_db?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=yes&characterEncoding=UTF-8&character_set_server=utf8mb4&createDatabaseIfNotExist=true
         SPRING_DATASOURCE_PASSWORD : 1199
       depends_on:
         - mysql

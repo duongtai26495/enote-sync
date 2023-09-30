@@ -3,7 +3,7 @@ FROM mysql:latest
 
 # Thiết lập biến môi trường cho MySQL
 ENV MYSQL_ROOT_PASSWORD=1199
-ENV MYSQL_DATABASE=enote
+ENV MYSQL_DATABASE=space_db
 ENV MYSQL_USER=root
 ENV MYSQL_PASSWORD=1199
 
