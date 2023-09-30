@@ -104,6 +104,8 @@ public final class AppConstants {
     public static final String Z_A_LABEL = "Alphabet Z -> A";
     public static final String DONE_LAST_UPDATED_ASC_LABEL = "Finish by last updated, old to new";
     public static final String DONE_LAST_UPDATED_DESC_LABEL = "Finish by last updated, new to old";
+    public static final String FAVORITE_DESC_LABEL = "My favorites, New to Old";
+    public static final String FAVORITE_ASC_LABEL = "My favorites, Old to New";
 
     public static final String LAST_EDITED_DESC_VALUE = "updated_at_desc";
     public static final String LAST_EDITED_ASC_VALUE = "updated_at_asc";
@@ -112,6 +114,9 @@ public final class AppConstants {
     public static final String A_Z_VALUE = "a_z";
     public static final String Z_A_VALUE = "z_a";
     public static final String DONE_LAST_UPDATED_ASC_VALUE = "done_last_updated_asc";
+
+    public static final String FAVORITE_DESC_VALUE = "favorite_desc";
+    public static final String FAVORITE_ASC_VALUE = "favorite_asc";
 
     public static final String DONE_LAST_UPDATED_DESC_VALUE = "done_last_updated_desc";
     public static final String SUBJECT_ACTIVE_CONTENT = "Activate your account";

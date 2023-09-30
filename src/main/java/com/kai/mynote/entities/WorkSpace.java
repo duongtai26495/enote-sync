@@ -32,6 +32,8 @@ public class WorkSpace {
 
     private String updated_at;
 
+    private boolean favorite = false;
+
     @ManyToOne
     @JoinColumn(name = "author_id")
     @JsonIgnore

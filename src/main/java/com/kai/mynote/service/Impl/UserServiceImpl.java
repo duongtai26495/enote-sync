@@ -146,8 +146,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             case AppConstants.CREATED_AT_ASC_VALUE -> workspaceRepository.getAllWorkspaceByUsernameOrderByCreatedAtASC(username, pageable);
             case AppConstants.A_Z_VALUE -> workspaceRepository.getAllWorkspaceByUsernameOrderByNameASC(username, pageable);
             case AppConstants.Z_A_VALUE -> workspaceRepository.getAllWorkspaceByUsernameOrderByNameDESC(username, pageable);
+            case AppConstants.FAVORITE_DESC_VALUE -> workspaceRepository.getAllWorkspaceByUsernameOrderByFavoriteDESC(username, pageable);
+            case AppConstants.FAVORITE_ASC_VALUE -> workspaceRepository.getAllWorkspaceByUsernameOrderByFavoriteASC(username, pageable);
             default -> workspaceRepository.getAllWorkspaceByUsernameOrderByUpdatedAtDESC(username, pageable);
         };
+    }
+
+    @Override
+    public Page<WorkSpace> getAllFavoriteWorkspace(String username, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return workspaceRepository.getAllWorkspaceByUsernameOrderByFavoriteDESC(username, pageable);
     }
 
     @Override

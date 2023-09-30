@@ -45,6 +45,20 @@ public class WorkSpaceController {
         return null;
     }
 
+    @GetMapping("/favorites")
+    public Page<WorkSpace> getFavoriteWs(Authentication authentication,
+                                         @RequestParam(defaultValue = "0") int page,
+                                         @RequestParam(defaultValue = "10") int size){
+        if (userUtil.isUserActive(authentication)) {
+            if(page < 0) {page = 0;}
+            if(size < 0) {size = 10;}
+
+            logger.info("User " + authentication.getName() + " just get all favorite workspaces");
+            return userService.getAllWorkspace(authentication.getName(), page, size, AppConstants.LAST_EDITED_DESC_VALUE);
+        }
+        return null;
+    }
+
     @GetMapping("/info/{id}")
     public ResponseEntity<ResponseObject> getInfoWorkspace(@PathVariable Long id, Authentication authentication){
 

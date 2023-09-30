@@ -26,6 +26,8 @@ public interface UserService {
 
     Page<WorkSpace> getAllWorkspace(String username, int pageNo, int pageSize, String sort);
 
+    Page<WorkSpace> getAllFavoriteWorkspace(String username, int page, int size);
+
     User getUserForAuthor(String username);
 
     void addTokenToBlacklist(String username, String token);

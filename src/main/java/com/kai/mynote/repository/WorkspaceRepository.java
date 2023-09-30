@@ -35,4 +35,9 @@ public interface WorkspaceRepository extends JpaRepository<WorkSpace, Long> {
 
     @Query(value = "SELECT w FROM WorkSpace w WHERE w.author.username = :username ORDER BY w.name DESC")
     Page<WorkSpace> getAllWorkspaceByUsernameOrderByNameDESC(@Param("username") String username, Pageable pageable);
+
+    @Query(value = "SELECT w FROM WorkSpace w WHERE w.author.username = :username AND w.favorite = true ORDER BY w.updated_at DESC")
+    Page<WorkSpace> getAllWorkspaceByUsernameOrderByFavoriteDESC(@Param("username") String username, Pageable pageable);
+    @Query(value = "SELECT w FROM WorkSpace w WHERE w.author.username = :username AND w.favorite = true ORDER BY w.updated_at ASC")
+    Page<WorkSpace> getAllWorkspaceByUsernameOrderByFavoriteASC(@Param("username") String username, Pageable pageable);
 }

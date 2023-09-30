@@ -46,6 +46,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             if (workSpace.getName() != null && !currentWs.getName().equalsIgnoreCase(workSpace.getName()))
             {currentWs.setName(workSpace.getName());}
 
+            currentWs.setFavorite(workSpace.isFavorite());
+
             if (workSpace.getFeatured_image() != null && !currentWs.getFeatured_image().equalsIgnoreCase(workSpace.getFeatured_image()))
             {currentWs.setFeatured_image(workSpace.getFeatured_image());}
             Date date = new Date();
