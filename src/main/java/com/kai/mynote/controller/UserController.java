@@ -1,14 +1,11 @@
 package com.kai.mynote.controller;
 
 
-import com.kai.mynote.entities.Note;
+import com.kai.mynote.entities.Media;
 import com.kai.mynote.entities.User;
 import com.kai.mynote.service.Impl.FileServiceImpl;
-import com.kai.mynote.service.Impl.NoteServiceImpl;
 import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.dto.ResponseObject;
-import com.kai.mynote.dto.UserDTO;
-import com.kai.mynote.dto.UserUpdateDTO;
 import com.kai.mynote.service.Impl.UserServiceImpl;
 import com.kai.mynote.util.JwtUtil;
 import com.kai.mynote.util.UserUtil;
@@ -19,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -113,7 +111,7 @@ public class UserController {
                     );
                 }
 
-                if (!fileService.isImage(file)) {
+                if (fileService.isImage(file)) {
                     logger.warn("User "+username+" uploaded not an image file");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                             new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
@@ -172,5 +170,16 @@ public class UserController {
         return false;
     }
 
-
+    @GetMapping("media/remove/{name}")
+    private ResponseEntity<ResponseObject> removeMedia(Authentication authentication, @PathVariable String name) {
+        Media media = fileService.getMediaByName(name);
+        if (media != null && media.getAuthor().getUsername().equalsIgnoreCase(authentication.getName())) {
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.REMOVE_MEDIA, fileService.removeImageByName(media))
+                );
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.NOT_PERMISSION, null)
+        );
+    }
 }

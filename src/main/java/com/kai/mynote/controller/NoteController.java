@@ -1,6 +1,7 @@
 package com.kai.mynote.controller;
 
 
+import com.kai.mynote.entities.Media;
 import com.kai.mynote.util.AppConstants;
 import com.kai.mynote.dto.ResponseObject;
 import com.kai.mynote.entities.Note;
@@ -22,10 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/note")
@@ -248,7 +245,7 @@ public class NoteController {
                 }
 
                 // Kiểm tra xem tệp có phải là ảnh không
-                if (!fileService.isImage(file)) {
+                if (fileService.isImage(file)) {
                     logger.warn("User " + authentication.getName() + " uploaded not an image file");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                             new ResponseObject(AppConstants.FAILURE_STATUS, AppConstants.BAD_REQUEST_MSG, null)
@@ -257,7 +254,8 @@ public class NoteController {
 
 
                 Note note = noteService.getNoteById(Long.parseLong(id));
-                String imageURL = fileService.storeNoteImage(file);
+                Media media = fileService.saveMedia(file, authentication.getName());
+                String imageURL = media.getName();
                 note.setFeatured_image(imageURL);
                 // Trả về tên tệp ảnh
                 noteService.updateNote(note);

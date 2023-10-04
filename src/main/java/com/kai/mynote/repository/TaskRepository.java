@@ -21,13 +21,13 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query("SELECT t FROM Task t WHERE t.author.username =:username")
     List<Task> getAllTasksByUsername(String username);
 
-    @Query("SELECT t FROM Task t WHERE t.note.id =:id ORDER BY t.updated_at DESC")
+    @Query("SELECT t FROM Task t WHERE t.note.id =:id ORDER BY t.type DESC, t.updated_at DESC")
     Page<Task> findByNoteIdOrderByLastEditedAtDESC(Long id, Pageable pageable);
 
-    @Query("SELECT t FROM Task t WHERE t.note.id =:id ORDER BY t.created_at DESC")
+    @Query("SELECT t FROM Task t WHERE t.note.id =:id ORDER BY t.type DESC, t.created_at DESC")
     Page<Task> findByNoteIdOrderByCreatedAtDESC(Long id, Pageable pageable);
 
-    @Query("SELECT t FROM Task t WHERE t.note.id =:id ORDER BY t.created_at ASC")
+    @Query("SELECT t FROM Task t WHERE t.note.id =:id ORDER BY t.type DESC, t.created_at ASC")
     Page<Task> findByNoteIdOrderByCreatedAtASC(Long id, Pageable pageable);
 
 }

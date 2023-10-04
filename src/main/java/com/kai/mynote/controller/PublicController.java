@@ -153,7 +153,6 @@ public class PublicController {
         }
         if (user != null && user.isEnabled() && user.getSendActivateMailCount() < 3) {
             userService.sendActivateMail(userService.getUserByEmail(email));
-            logger.info("Resend active email: " + email);
             return ResponseEntity.ok(new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.EMAIL_SENT, null));
         } else if (user != null && user.isEnabled()) {
             Date currentDate = new Date();

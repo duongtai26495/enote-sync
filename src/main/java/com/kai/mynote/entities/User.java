@@ -55,6 +55,11 @@ public class User {
     @JsonIgnore
     private List<Note> notes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "author")
+    private List<Media> medias = new ArrayList<>();
+
+    private int media_count;
+
     private boolean activate = false;
 
     @OneToMany(mappedBy = "author")
@@ -98,4 +103,5 @@ public class User {
     public int getWorkspace_count() {
         return this.workspaces.size();
     }
+    public int media_count() {return this.medias.size();}
 }

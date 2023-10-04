@@ -56,6 +56,8 @@ public final class AppConstants {
     public static final String UPLOAD_IMAGE_SUCCESS = "Upload image success";
     public static final String NOT_PERMISSION = "You do not permission";
     public static final String HAVE_ERROR = "Have an error. Try again";
+    public static final String NOT_FOUND = "Not found";
+    public static final String REMOVE_MEDIA = "Remove media";
 
     //role
     public static final String ROLE_USER = "ROLE_USER";
