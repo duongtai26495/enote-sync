@@ -18,6 +18,8 @@ public class WorkSpace {
 
     private String name;
 
+    private String description = "";
+
     @Column(length = 1024)
     private String featured_image = "";
 
