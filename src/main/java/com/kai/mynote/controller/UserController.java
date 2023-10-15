@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/user/")
+@RequestMapping(AppConstants.API_PREFIX_V1+"user/")
 public class UserController {
 
     @Autowired
@@ -31,7 +31,6 @@ public class UserController {
 
     @Autowired
     private UserServiceImpl userService;
-
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -70,7 +69,6 @@ public class UserController {
     private ResponseEntity<ResponseObject> createErrorResponse() {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(AppConstants.FAILURE_STATUS, "Not permission", null));
     }
-
 
     @GetMapping("refresh")
     public ResponseEntity<ResponseObject> refreshToken(Authentication authentication, HttpServletRequest request){
@@ -151,9 +149,6 @@ public class UserController {
         }
         return null;
     }
-
-
-
 
     private boolean getAndAddTokenToBlackList (Authentication authentication, HttpServletRequest request){
         String authHeader = request.getHeader(AppConstants.AUTH_HEADER);

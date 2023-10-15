@@ -35,7 +35,7 @@ public final class AppConstants {
     public static final String AUTH_HEADER = "Authorization";
     public static final String BEARER_TOKEN_PREFIX = "Bearer ";
     public static final String ACTIVATED_FAIL = "Activated fail";
-
+    public static final String API_PREFIX_V1 = "/api/v1/";
 
     public static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 

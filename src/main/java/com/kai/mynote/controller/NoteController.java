@@ -25,9 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/note")
+@RequestMapping(AppConstants.API_PREFIX_V1+"note")
 public class NoteController {
-
     @Autowired
     private FileServiceImpl fileService;
     @Autowired
@@ -259,6 +258,8 @@ public class NoteController {
                 note.setFeatured_image(imageURL);
                 // Trả về tên tệp ảnh
                 noteService.updateNote(note);
+
+                logger.warn("User " + authentication.getName() + " uploaded an image: " + imageURL);
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject(AppConstants.SUCCESS_STATUS, AppConstants.NOTE + " " + AppConstants.UPDATED, imageURL)
                 );

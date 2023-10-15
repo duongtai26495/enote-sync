@@ -30,10 +30,12 @@ import java.text.ParseException;
 import java.util.*;
 
 @RestController
-@RequestMapping("/public")
+@RequestMapping(AppConstants.API_PREFIX_V1+"public")
 public class PublicController {
+
     @Value("${upload.path}")
     private String uploadPath;
+
     @Autowired
     private UserServiceImpl userService;
 

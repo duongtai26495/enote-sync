@@ -1,6 +1,5 @@
 package com.kai.mynote.service.Impl;
 
-import com.kai.mynote.controller.UserController;
 import com.kai.mynote.entities.Media;
 import com.kai.mynote.repository.MediaRepository;
 import com.kai.mynote.repository.UserRepository;
@@ -49,7 +48,6 @@ public class FileServiceImpl implements FileService {
         String generatedFileName = UUID.randomUUID().toString().replace("-", "");
         generatedFileName = generatedFileName + "." + fileExtension;
 
-        System.out.println(generatedFileName);
         Path storageFolder = Paths.get(uploadPath);
         // Tạo thư mục nếu chưa tồn tại
             try {
@@ -97,7 +95,6 @@ public class FileServiceImpl implements FileService {
     public ResponseEntity<byte[]> getProfileImage(String fileName) {
         return null;
     }
-
 
     @Override
     public boolean isImage(MultipartFile file) {
@@ -152,5 +149,4 @@ public class FileServiceImpl implements FileService {
     public Media getMediaByName(String name) {
         return mediaRepository.getMediaByName(name);
     }
-
 }

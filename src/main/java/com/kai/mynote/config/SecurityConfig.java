@@ -30,8 +30,8 @@ public class SecurityConfig {
                 .addFilterBefore(requestFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->{
-                    auth.requestMatchers("/public/**").permitAll();
-                    auth.requestMatchers("/user/**", "/note/**", "/workspace/**").hasRole(AppConstants.ROLE_USER_NAME);
+                    auth.requestMatchers(AppConstants.API_PREFIX_V1+"public/**").permitAll();
+                    auth.requestMatchers(AppConstants.API_PREFIX_V1+"user/**", AppConstants.API_PREFIX_V1+"note/**", AppConstants.API_PREFIX_V1+"workspace/**").hasRole(AppConstants.ROLE_USER_NAME);
                     auth.anyRequest().authenticated();
                 })
 //                .oauth2Login(oauth2Login -> {

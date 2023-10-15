@@ -17,12 +17,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/workspace")
+@RequestMapping(AppConstants.API_PREFIX_V1+"workspace")
 public class WorkSpaceController {
-
     @Autowired
     private WorkspaceServiceImpl workspaceService;
-
     @Autowired
     private UserServiceImpl userService;
     @Autowired
@@ -107,7 +105,6 @@ public class WorkSpaceController {
             return null;
     }
 
-
     @PutMapping("/update")
     public ResponseEntity<ResponseObject> updateWs(@RequestBody WorkSpace workSpace, Authentication authentication){
         WorkSpace ws = workspaceService.getWorkspaceById(workSpace.getId());
@@ -124,7 +121,6 @@ public class WorkSpaceController {
                 new ResponseObject(AppConstants.FAILURE_STATUS,"Bad request",null)
         );
     }
-
 
     @DeleteMapping("/remove/{id}")
     public ResponseEntity<ResponseObject> deleteWs(@PathVariable Long id, Authentication authentication){
